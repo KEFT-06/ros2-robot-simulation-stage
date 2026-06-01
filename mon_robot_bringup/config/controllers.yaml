@@ -1,0 +1,33 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100
+    use_sim_time: true
+
+joint_state_broadcaster:
+  ros__parameters:
+    type: joint_state_broadcaster/JointStateBroadcaster
+
+joint_trajectory_controller:
+  ros__parameters:
+    type: joint_trajectory_controller/JointTrajectoryController
+    joint_names:
+      - joint1
+      - joint2
+    command_interfaces:
+      - effort
+    state_interfaces:
+      - position
+      - velocity
+    allow_partial_joints_goal: false
+    constraints:
+      stopped_velocity_tolerance: 0.01
+      goal_time: 0.0
+    gains:
+      joint1:
+        p: 100.0
+        i: 0.0
+        d: 10.0
+      joint2:
+        p: 100.0
+        i: 0.0
+        d: 10.0
