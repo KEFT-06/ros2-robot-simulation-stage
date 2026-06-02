@@ -1,106 +1,300 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mon_robot">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="atawi_3a3">
 
-  <!-- Base -->
+  <!-- ======================== BASE LINK ======================== -->
   <link name="base_link">
     <inertial>
-      <mass value="2.0"/>
-      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+      <mass value="5.0"/>
+      <inertia ixx="0.04167" ixy="0" ixz="0"
+               iyy="0.04167" iyz="0" izz="0.04167"/>
     </inertial>
     <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.3 0.3 0.2"/>
+        <mesh filename="package://mon_robot_description/meshes/Base.stl"
+              scale="0.001 0.001 0.001"/>
       </geometry>
-      <material name="blue">
-        <color rgba="0 0 1 1"/>
+      <material name="chassis_gray">
+        <color rgba="0.5 0.5 0.5 1"/>
       </material>
     </visual>
     <collision>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
       <geometry>
-        <box size="0.3 0.3 0.2"/>
+        <box size="0.037 0.037 0.099"/>
       </geometry>
     </collision>
   </link>
 
-  <!-- Joint 1 (rotation base) -->
-  <joint name="joint1" type="revolute">
+  <!-- ======================== COUVERCLE ======================== -->
+  <joint name="lid_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="lid_link"/>
+    <origin xyz="0 0 0.08" rpy="0 0 0"/>
+  </joint>
+
+  <link name="lid_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.5"/>
+      <inertia ixx="0.001" ixy="0" ixz="0"
+               iyy="0.001" iyz="0" izz="0.0005"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://mon_robot_description/meshes/Lid.stl"
+              scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="lid_dark">
+        <color rgba="0.3 0.3 0.3 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.037 0.037 0.01"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ======================== GRILLE ======================== -->
+  <joint name="grid_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="grid_link"/>
+    <origin xyz="0 0 0.06" rpy="0 0 0"/>
+  </joint>
+
+  <link name="grid_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.2"/>
+      <inertia ixx="0.0005" ixy="0" ixz="0"
+               iyy="0.0005" iyz="0" izz="0.0002"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://mon_robot_description/meshes/Grid.stl"
+              scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="grid_blue">
+        <color rgba="0.2 0.2 0.8 0.7"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.037 0.037 0.005"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ======================== PARTIE FRONTALE ======================== -->
+  <joint name="frontal_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="frontal_link"/>
+    <origin xyz="0.02 0 0.05" rpy="0 0 0"/>
+  </joint>
+
+  <link name="frontal_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1.0"/>
+      <inertia ixx="0.005" ixy="0" ixz="0"
+               iyy="0.005" iyz="0" izz="0.003"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://mon_robot_description/meshes/frontal_part2.stl"
+              scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="frontal_red">
+        <color rgba="1 0 0 0.9"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.037 0.05"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ======================== JOINT 1 - Rotation de base ======================== -->
+  <joint name="joint1_rotation" type="revolute">
     <parent link="base_link"/>
     <child link="link1"/>
-    <origin xyz="0 0 0.1" rpy="0 0 0"/>
+    <origin xyz="0 0 0.10" rpy="0 0 0"/>
     <axis xyz="0 0 1"/>
-    <limit lower="-1.57" upper="1.57" effort="10" velocity="1.0"/>
-    <dynamics damping="0.1" friction="0.0"/>
+    <limit lower="-3.14159" upper="3.14159"
+           effort="50" velocity="1.0"/>
+    <dynamics damping="0.5" friction="0.1"/>
   </joint>
 
   <link name="link1">
     <inertial>
+      <origin xyz="0 0 0.1" rpy="0 0 0"/>
+      <mass value="1.5"/>
+      <inertia ixx="0.01" ixy="0" ixz="0"
+               iyy="0.01" iyz="0" izz="0.005"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.1" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.2"/>
+      </geometry>
+      <material name="link_orange">
+        <color rgba="1 0.65 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.1" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.03" length="0.2"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ======================== JOINT 2 - Flexion du bras ======================== -->
+  <joint name="joint2_flexion" type="revolute">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin xyz="0 0 0.2" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.57079" upper="1.57079"
+           effort="40" velocity="1.0"/>
+    <dynamics damping="0.3" friction="0.05"/>
+  </joint>
+
+  <link name="link2">
+    <inertial>
+      <origin xyz="0 0 0.1" rpy="0 0 0"/>
       <mass value="1.0"/>
-      <inertia ixx="0.005" ixy="0" ixz="0" iyy="0.005" iyz="0" izz="0.001"/>
+      <inertia ixx="0.005" ixy="0" ixz="0"
+               iyy="0.005" iyz="0" izz="0.002"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.1" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.025" length="0.2"/>
+      </geometry>
+      <material name="link_green">
+        <color rgba="0 1 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.1" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.025" length="0.2"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ======================== JOINT 3 - Rotation poignet ======================== -->
+  <joint name="joint3_wrist" type="revolute">
+    <parent link="link2"/>
+    <child link="link3"/>
+    <origin xyz="0 0 0.2" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14159" upper="3.14159"
+           effort="30" velocity="1.5"/>
+    <dynamics damping="0.2" friction="0.03"/>
+  </joint>
+
+  <link name="link3">
+    <inertial>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+      <mass value="0.5"/>
+      <inertia ixx="0.001" ixy="0" ixz="0"
+               iyy="0.001" iyz="0" izz="0.0008"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.02" length="0.1"/>
+      </geometry>
+      <material name="link_blue">
+        <color rgba="0 0 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.02" length="0.1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ======================== EFFECTEUR FINAL ======================== -->
+  <joint name="tool_joint" type="fixed">
+    <parent link="link3"/>
+    <child link="tool_link"/>
+    <origin xyz="0 0 0.1" rpy="0 0 0"/>
+  </joint>
+
+  <link name="tool_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.2"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0"
+               iyy="0.0001" iyz="0" izz="0.0001"/>
     </inertial>
     <visual>
       <geometry>
-        <box size="0.05 0.05 0.3"/>
+        <sphere radius="0.02"/>
       </geometry>
-      <origin xyz="0 0 0.15"/>
-      <material name="red">
+      <material name="tool_red">
         <color rgba="1 0 0 1"/>
       </material>
     </visual>
     <collision>
       <geometry>
-        <box size="0.05 0.05 0.3"/>
+        <sphere radius="0.02"/>
       </geometry>
-      <origin xyz="0 0 0.15"/>
     </collision>
   </link>
 
-  <!-- Joint 2 (articulation bras) -->
-  <joint name="joint2" type="revolute">
-    <parent link="link1"/>
-    <child link="link2"/>
-    <origin xyz="0 0 0.3" rpy="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <limit lower="-1.57" upper="1.57" effort="10" velocity="1.0"/>
-    <dynamics damping="0.1" friction="0.0"/>
-  </joint>
+  <!-- ======================== ROS2 CONTROL ======================== -->
+  <!-- CORRECTION CRITIQUE : bloc obligatoire pour ros2_control -->
+  <ros2_control name="GazeboSystem" type="system">
+    <hardware>
+      <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+    </hardware>
 
-  <link name="link2">
-    <inertial>
-      <mass value="0.5"/>
-      <inertia ixx="0.002" ixy="0" ixz="0" iyy="0.002" iyz="0" izz="0.0005"/>
-    </inertial>
-    <visual>
-      <geometry>
-        <box size="0.04 0.04 0.25"/>
-      </geometry>
-      <origin xyz="0 0 0.125"/>
-      <material name="green">
-        <color rgba="0 1 0 1"/>
-      </material>
-    </visual>
-    <collision>
-      <geometry>
-        <box size="0.04 0.04 0.25"/>
-      </geometry>
-      <origin xyz="0 0 0.125"/>
-    </collision>
-  </link>
+    <joint name="joint1_rotation">
+      <command_interface name="position">
+        <param name="min">-3.14159</param>
+        <param name="max">3.14159</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+      <state_interface name="effort"/>
+    </joint>
 
-  <!-- Gazebo plugin pour ros2_control -->
-  <gazebo>
-    <plugin filename="gz_ros2_control/GazeboSimSystem" name="gazebo_ros2_control">
-      <parameters>$(find mon_robot_description)/config/controllers.yaml</parameters>
-      <joint name="joint1">
-        <command_interface name="effort"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-      </joint>
-      <joint name="joint2">
-        <command_interface name="effort"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-      </joint>
-    </plugin>
-  </gazebo>
+    <joint name="joint2_flexion">
+      <command_interface name="position">
+        <param name="min">-1.57079</param>
+        <param name="max">1.57079</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+      <state_interface name="effort"/>
+    </joint>
+
+    <joint name="joint3_wrist">
+      <command_interface name="position">
+        <param name="min">-3.14159</param>
+        <param name="max">3.14159</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+      <state_interface name="effort"/>
+    </joint>
+
+  </ros2_control>
 
 </robot>
+EOF

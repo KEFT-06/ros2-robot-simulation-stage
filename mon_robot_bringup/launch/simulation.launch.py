@@ -19,14 +19,8 @@ def generate_launch_description():
         'worlds',
         'robot_world.sdf'
     ])
-    
-    controllers_config = PathJoinSubstitution([
-        FindPackageShare('mon_robot_bringup'),
-        'config',
-        'controllers.yaml'
-    ])
 
-    robot_description = Command(['xacro ', urdf_model_path])
+    robot_description = Command(['xacro ', urdf_model_path, ' use_gazebo:=true'])
 
     # Robot State Publisher
     robot_state_publisher = Node(
@@ -48,7 +42,9 @@ def generate_launch_description():
                 'gz_sim.launch.py'
             ])
         ]),
-        launch_arguments={'gz_args': world_path}.items()
+        launch_arguments={
+            'gz_args': [world_path, ' -v 4']
+        }.items()
     )
 
     # Spawn robot in Gazebo
@@ -56,28 +52,32 @@ def generate_launch_description():
         package='ros_gz_sim',
         executable='create',
         arguments=[
-            '-name', 'mon_robot',
+            '-name', 'atawi_3a3',
             '-x', '0',
             '-y', '0',
-            '-z', '0.1',
+            '-z', '0.5',
             '-file', urdf_model_path
         ],
         output='screen'
     )
 
-    # Bridge Gazebo/ROS 2
+    # Bridge Gazebo/ROS 2 - Topics
     bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
         arguments=[
             '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
-            '/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model'
-        ]
+            '/atawi_3a3/joint_states@sensor_msgs/msg/JointState[gz.msgs.Model'
+        ],
+        remappings=[
+            ('/atawi_3a3/joint_states', '/joint_states')
+        ],
+        output='screen'
     )
 
     # Load Joint State Broadcaster
-    spawn_jsb = TimerAction(
-        period=5.0,
+    load_jsb = TimerAction(
+        period=3.0,
         actions=[
             ExecuteProcess(
                 cmd=['ros2', 'control', 'load_controller',
@@ -89,8 +89,8 @@ def generate_launch_description():
     )
 
     # Load Joint Trajectory Controller
-    spawn_jtc = TimerAction(
-        period=7.0,
+    load_jtc = TimerAction(
+        period=6.0,
         actions=[
             ExecuteProcess(
                 cmd=['ros2', 'control', 'load_controller',
@@ -106,6 +106,6 @@ def generate_launch_description():
         gazebo,
         spawn_robot,
         bridge,
-        spawn_jsb,
-        spawn_jtc,
+        load_jsb,
+        load_jtc,
     ])

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>mon_robot_control</name>
+  <version>0.0.1</version>
+  <description>Scripts de contrôle et validation cinématique pour le robot ATAWI-3A3</description>
+  
+  <maintainer email="stage@atawi.fr">Stage ATAWI</maintainer>
+  <license>MIT</license>
+
+  <author email="stage@atawi.fr">ATAWI Team</author>
+
+  <!-- Dependencies -->
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <!-- Build dependencies -->
+  <build_depend>rclpy</build_depend>
+  <build_depend>trajectory_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>builtin_interfaces</build_depend>
+
+  <!-- Exec dependencies -->
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>trajectory_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>builtin_interfaces</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+
+  <!-- Test dependencies -->
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+</package>
