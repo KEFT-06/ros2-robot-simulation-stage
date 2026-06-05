@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="atawi_3a3">
 
-  <!-- ======================== BASE LINK ======================== -->
   <link name="base_link">
     <inertial>
       <origin xyz="0 0 0.05" rpy="0 0 0"/>
@@ -27,7 +26,6 @@
     </collision>
   </link>
 
-  <!-- ======================== COUVERCLE ======================== -->
   <joint name="lid_joint" type="fixed">
     <parent link="base_link"/>
     <child link="lid_link"/>
@@ -59,7 +57,6 @@
     </collision>
   </link>
 
-  <!-- ======================== GRILLE ======================== -->
   <joint name="grid_joint" type="fixed">
     <parent link="base_link"/>
     <child link="grid_link"/>
@@ -91,7 +88,6 @@
     </collision>
   </link>
 
-  <!-- ======================== PARTIE FRONTALE ======================== -->
   <joint name="frontal_joint" type="fixed">
     <parent link="base_link"/>
     <child link="frontal_link"/>
@@ -123,7 +119,6 @@
     </collision>
   </link>
 
-  <!-- ======================== JOINT 1 - Rotation de base ======================== -->
   <joint name="joint1_rotation" type="revolute">
     <parent link="base_link"/>
     <child link="link1"/>
@@ -158,7 +153,6 @@
     </collision>
   </link>
 
-  <!-- ======================== JOINT 2 - Flexion du bras ======================== -->
   <joint name="joint2_flexion" type="revolute">
     <parent link="link1"/>
     <child link="link2"/>
@@ -193,7 +187,6 @@
     </collision>
   </link>
 
-  <!-- ======================== JOINT 3 - Rotation poignet ======================== -->
   <joint name="joint3_wrist" type="revolute">
     <parent link="link2"/>
     <child link="link3"/>
@@ -228,7 +221,6 @@
     </collision>
   </link>
 
-  <!-- ======================== EFFECTEUR FINAL ======================== -->
   <joint name="tool_joint" type="fixed">
     <parent link="link3"/>
     <child link="tool_link"/>
@@ -257,13 +249,10 @@
     </collision>
   </link>
 
-  <!-- ======================== ROS2 CONTROL ======================== -->
-  <!-- CORRECTION CRITIQUE : bloc obligatoire pour ros2_control -->
   <ros2_control name="GazeboSystem" type="system">
     <hardware>
       <plugin>gz_ros2_control/GazeboSimSystem</plugin>
     </hardware>
-
     <joint name="joint1_rotation">
       <command_interface name="position">
         <param name="min">-3.14159</param>
@@ -273,7 +262,6 @@
       <state_interface name="velocity"/>
       <state_interface name="effort"/>
     </joint>
-
     <joint name="joint2_flexion">
       <command_interface name="position">
         <param name="min">-1.57079</param>
@@ -283,7 +271,6 @@
       <state_interface name="velocity"/>
       <state_interface name="effort"/>
     </joint>
-
     <joint name="joint3_wrist">
       <command_interface name="position">
         <param name="min">-3.14159</param>
@@ -293,8 +280,6 @@
       <state_interface name="velocity"/>
       <state_interface name="effort"/>
     </joint>
-
   </ros2_control>
 
 </robot>
-EOF

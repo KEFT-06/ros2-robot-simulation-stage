@@ -1,3 +1,4 @@
 {
-    "github.copilot.chat.codeGeneration.useInstructionFiles": true
+    "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+    "cmake.sourceDirectory": "C:/Users/FOKO/Documents/GitHub/ros2-robot-simulation-stage/mon_robot_bringup"
 }
