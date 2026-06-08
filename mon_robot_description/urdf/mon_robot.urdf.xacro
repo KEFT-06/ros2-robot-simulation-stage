@@ -1,6 +1,16 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="atawi_3a3">
 
+  <!-- LIEN FANTOME obligatoire — base_link ne doit pas avoir d'inertie -->
+  <link name="world"/>
+
+  <joint name="world_joint" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ici commence ton base_link existant -->
   <link name="base_link">
     <inertial>
       <origin xyz="0 0 0.05" rpy="0 0 0"/>
@@ -11,8 +21,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/Base.stl"
-              scale="0.001 0.001 0.001"/>
+        <box size ="0.3 0.2 0.1"/>
       </geometry>
       <material name="chassis_gray">
         <color rgba="0.5 0.5 0.5 1"/>
