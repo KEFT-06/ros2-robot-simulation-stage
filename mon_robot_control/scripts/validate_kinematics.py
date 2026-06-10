@@ -3,7 +3,6 @@
 Script de validation de la cinématique du robot ATAWI-3A3
 Teste la cinématique directe (FK) et inverse (IK) du robot
 """
-
 import numpy as np
 import math
 from typing import Tuple, List
