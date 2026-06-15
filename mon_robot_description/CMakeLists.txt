@@ -3,7 +3,6 @@ project(mon_robot_description)
 
 # Find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(python3 REQUIRED)  
 
 # Install URDF files
 install(
