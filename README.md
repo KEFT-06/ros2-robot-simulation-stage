@@ -102,6 +102,43 @@ Verifier que les packages sont visibles:
 ros2 pkg list | grep mon_robot
 ```
 
+## Utilisation avec Docker
+
+Construire l'image reproductible ROS 2 Jazzy:
+
+```bash
+docker build -t atawi-3a3:jazzy .
+```
+
+Ouvrir un shell dans le conteneur:
+
+```bash
+docker run --rm -it atawi-3a3:jazzy
+```
+
+Lancer RViz depuis le conteneur sur Linux avec X11:
+
+```bash
+xhost +local:docker
+docker run --rm -it --net=host \
+  -e DISPLAY=$DISPLAY \
+  -e QT_X11_NO_MITSHM=1 \
+  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  atawi-3a3:jazzy \
+  ros2 launch mon_robot_bringup display.launch.py
+```
+
+Lancer Gazebo:
+
+```bash
+docker run --rm -it --net=host \
+  -e DISPLAY=$DISPLAY \
+  -e QT_X11_NO_MITSHM=1 \
+  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  atawi-3a3:jazzy \
+  ros2 launch mon_robot_bringup simulation.launch.py
+```
+
 ## Lancer RViz
 
 ```bash
