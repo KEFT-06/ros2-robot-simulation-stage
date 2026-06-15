@@ -16,6 +16,10 @@ install(
   PROGRAMS
     scripts/send_trajectory.py
     scripts/validate_kinematics.py
+    scripts/fk_validation.py
+    scripts/ik_validation.py
+    scripts/validate_fk.py
+    scripts/workspace_visualization.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

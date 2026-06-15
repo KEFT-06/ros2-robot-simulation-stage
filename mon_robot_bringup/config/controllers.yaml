@@ -3,24 +3,18 @@ controller_manager:
     update_rate: 100
     use_sim_time: true
 
-    # ✅ Types déclarés ICI, dans controller_manager
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
     joint_trajectory_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
-# ✅ Configuration détaillée en dehors
 joint_trajectory_controller:
   ros__parameters:
-
-    # ✅ "joints" et non "joint_names"
     joints:
-      - joint1_rotation
-      - joint2_flexion
-      - joint3_wrist
+      - joint1_head
+      - joint2_rotor
 
-    # ✅ "position" correspond à l'URDF
     command_interfaces:
       - position
 
@@ -28,37 +22,26 @@ joint_trajectory_controller:
       - position
       - velocity
 
-    # ✅ goal_time positif
-    constraints:
-      goal_time: 5.0
-      stopped_velocity_tolerance: 0.01
-      joint1_rotation:
-        goal: 0.05
-      joint2_flexion:
-        goal: 0.05
-      joint3_wrist:
-        goal: 0.05
-
     gains:
-      joint1_rotation:
-        p: 100.0
-        i: 0.01
-        d: 10.0
-        i_clamp_max:  2.0
-        i_clamp_min: -2.0
-      joint2_flexion:
+      joint1_head:
         p: 80.0
-        i: 0.005
+        i: 0.01
         d: 8.0
         i_clamp_max:  1.0
         i_clamp_min: -1.0
-      joint3_wrist:
-        p: 60.0
-        i: 0.003
-        d: 6.0
+      joint2_rotor:
+        p: 40.0
+        i: 0.005
+        d: 4.0
         i_clamp_max:  0.5
         i_clamp_min: -0.5
 
+    constraints:
+      goal_time: 5.0
+      joint1_head:
+        goal: 0.05
+      joint2_rotor:
+        goal: 0.05
+
     open_loop_control: false
     allow_partial_joints_goal: false
-EOF

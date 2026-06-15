@@ -16,7 +16,7 @@ class FKValidator(Node):
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
         
-        self.target_frame = 'link2'
+        self.target_frame = 'tool_link'
         self.reference_frame = 'base_link'
         
         self.create_timer(1.0, self.check_fk)

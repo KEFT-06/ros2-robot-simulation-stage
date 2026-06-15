@@ -25,18 +25,16 @@ class TrajectoryPublisher(Node):
             10
         )
         
-        # Noms des articulations
+        # Noms des articulations commandees dans l'URDF actuel
         self.joint_names = [
-            'joint1_rotation',
-            'joint2_flexion', 
-            'joint3_wrist'
+            'joint1_head',
+            'joint2_rotor'
         ]
         
         # Limites articulaires
         self.joint_limits = {
-            'joint1_rotation': (-math.pi, math.pi),
-            'joint2_flexion': (-math.pi/2, math.pi/2),
-            'joint3_wrist': (-math.pi, math.pi)
+            'joint1_head': (-math.pi, math.pi),
+            'joint2_rotor': (-math.pi, math.pi)
         }
         
         self.get_logger().info("Trajectory Publisher initialisé")
@@ -70,8 +68,8 @@ class TrajectoryPublisher(Node):
             
             point = JointTrajectoryPoint()
             point.positions = list(positions)
-            point.velocities = [0.0] * 3
-            point.accelerations = [0.0] * 3
+            point.velocities = [0.0] * len(self.joint_names)
+            point.accelerations = [0.0] * len(self.joint_names)
             point.time_from_start = Duration(sec=int(time_sec), nanosec=int((time_sec % 1) * 1e9))
             
             trajectory.points.append(point)
@@ -82,7 +80,7 @@ class TrajectoryPublisher(Node):
         for i, point in enumerate(trajectory.points):
             angles_deg = [math.degrees(p) for p in point.positions]
             self.get_logger().info(
-                f"  Point {i}: [{angles_deg[0]:.1f}°, {angles_deg[1]:.1f}°, {angles_deg[2]:.1f}°] "
+                f"  Point {i}: [{angles_deg[0]:.1f}°, {angles_deg[1]:.1f}°] "
                 f"t={point.time_from_start.sec}s"
             )
     
@@ -90,7 +88,7 @@ class TrajectoryPublisher(Node):
         """Trajectoire vers position de repos"""
         self.get_logger().info("\n📍 Trajectoire HOME (repos)")
         waypoints = [
-            [0.0, 0.0, 0.0]  # Position de repos
+            [0.0, 0.0]  # Position de repos
         ]
         self.publish_trajectory(waypoints, [3.0])
     
@@ -98,26 +96,25 @@ class TrajectoryPublisher(Node):
         """Trajectoire circulaire en rotation Z"""
         self.get_logger().info("\n🔄 Trajectoire SWEEP Z (rotation base)")
         waypoints = [
-            [0.0, 0.0, 0.0],
-            [math.pi/4, 0.0, 0.0],
-            [math.pi/2, 0.0, 0.0],
-            [-math.pi/2, 0.0, 0.0],
-            [-math.pi/4, 0.0, 0.0],
-            [0.0, 0.0, 0.0]
+            [0.0, 0.0],
+            [math.pi/4, 0.0],
+            [math.pi/2, 0.0],
+            [-math.pi/2, 0.0],
+            [-math.pi/4, 0.0],
+            [0.0, 0.0]
         ]
         times = [i * 1.0 for i in range(len(waypoints))]
         self.publish_trajectory(waypoints, times)
     
-    def trajectory_flex_arm(self):
-        """Trajectoire de flexion du bras"""
-        self.get_logger().info("\n💪 Trajectoire FLEX ARM (flexion bras)")
+    def trajectory_spin_rotor(self):
+        """Trajectoire de rotation du rotor"""
+        self.get_logger().info("\n💪 Trajectoire SPIN ROTOR")
         waypoints = [
-            [0.0, 0.0, 0.0],
-            [0.0, math.pi/6, 0.0],
-            [0.0, math.pi/4, 0.0],
-            [0.0, math.pi/3, 0.0],
-            [0.0, math.pi/4, 0.0],
-            [0.0, 0.0, 0.0]
+            [0.0, 0.0],
+            [0.0, math.pi/2],
+            [0.0, math.pi],
+            [0.0, -math.pi],
+            [0.0, 0.0]
         ]
         times = [i * 1.0 for i in range(len(waypoints))]
         self.publish_trajectory(waypoints, times)
@@ -126,12 +123,12 @@ class TrajectoryPublisher(Node):
         """Trajectoire complexe multi-articulaire"""
         self.get_logger().info("\n🎯 Trajectoire COMPLEXE (multi-articulations)")
         waypoints = [
-            [0.0, 0.0, 0.0],
-            [math.pi/6, math.pi/6, 0.0],
-            [math.pi/3, math.pi/4, math.pi/6],
-            [math.pi/2, 0.0, math.pi/3],
-            [math.pi/4, -math.pi/6, math.pi/6],
-            [0.0, 0.0, 0.0]
+            [0.0, 0.0],
+            [math.pi/6, math.pi/4],
+            [math.pi/3, math.pi/2],
+            [math.pi/2, 0.0],
+            [math.pi/4, -math.pi/2],
+            [0.0, 0.0]
         ]
         times = [i * 1.5 for i in range(len(waypoints))]
         self.publish_trajectory(waypoints, times)
@@ -146,9 +143,8 @@ class TrajectoryPublisher(Node):
             t = i * 0.1
             q1 = math.sin(t)
             q2 = math.cos(t) * math.pi / 4
-            q3 = math.sin(2*t) * math.pi / 6
             
-            waypoints.append([q1, q2, q3])
+            waypoints.append([q1, q2])
             times.append(t * 2.0)
         
         self.publish_trajectory(waypoints, times)
@@ -167,7 +163,7 @@ def main():
     trajectories = {
         'home': node.trajectory_home,
         'sweep': node.trajectory_sweep_z,
-        'flex': node.trajectory_flex_arm,
+        'spin': node.trajectory_spin_rotor,
         'complex': node.trajectory_complex,
         'sine': node.trajectory_sine_wave
     }

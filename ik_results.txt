@@ -1,9 +1,22 @@
-RESULTATS IK
-==================================================
+RESULTATS IK - Robot ATAWI-3A3 URDF 2 DOF
+=======================================================
 
-Cible verticale: pas de solution
+Yaw nul: cible=0.00 deg
+  q=[0.0, 0.0] deg
+  erreur yaw=0.000000000 deg
+  statut=OK
 
-Cible decalee: pas de solution
+Yaw 90 deg: cible=90.00 deg
+  q=[45.0, 45.0] deg
+  erreur yaw=0.000000000 deg
+  statut=OK
 
-Cible basse: pas de solution
+Yaw -120 deg: cible=-120.00 deg
+  q=[-60.0, -60.0] deg
+  erreur yaw=0.000000000 deg
+  statut=OK
 
+Yaw 180 deg: cible=180.00 deg
+  q=[90.0, 90.0] deg
+  erreur yaw=0.000000000 deg
+  statut=OK

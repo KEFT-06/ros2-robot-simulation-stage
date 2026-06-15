@@ -1,15 +1,14 @@
-RESULTATS FK
-==================================================
+RESULTATS FK - Robot ATAWI-3A3 URDF 2 DOF
+=======================================================
 
-Position neutre
-  x=0.0000 y=-0.2000 z=0.3000
+Position neutre: q = [0.0, 0.0] deg
+  x=0.0000m y=0.0000m z=0.0100m yaw=0.00deg
 
-Rotation 90 deg
-  x=0.2000 y=0.0000 z=0.3000
+Tete 90 deg: q = [90.0, 0.0] deg
+  x=0.0000m y=0.0000m z=0.0100m yaw=90.00deg
 
-Flexion 45 deg
-  x=0.1415 y=0.1414 z=0.3000
+Rotor 90 deg: q = [0.0, 90.0] deg
+  x=0.0000m y=0.0000m z=0.0100m yaw=90.00deg
 
-Config complexe
-  x=0.1931 y=-0.0520 z=0.3000
-
+Configuration composee: q = [45.0, 60.0] deg
+  x=0.0000m y=0.0000m z=0.0100m yaw=105.00deg
