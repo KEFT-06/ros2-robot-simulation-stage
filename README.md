@@ -55,6 +55,7 @@ Tous les autres joints du modele sont fixes. Le modele commandable actuel est do
 ```bash
 sudo apt update
 sudo apt install -y \
+  doxygen \
   ros-jazzy-desktop \
   ros-jazzy-ros2-control \
   ros-jazzy-ros2-controllers \

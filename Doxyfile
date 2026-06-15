@@ -1,0 +1,25 @@
+PROJECT_NAME           = "ATAWI-3A3 ROS 2 Robot Simulation"
+PROJECT_BRIEF          = "Documentation du projet ROS 2 Jazzy pour le robot ATAWI-3A3"
+OUTPUT_DIRECTORY       = docs/doxygen
+INPUT                  = README.md \
+                         docs \
+                         mon_robot_bringup \
+                         mon_robot_control \
+                         mon_robot_description
+RECURSIVE              = YES
+FILE_PATTERNS          = *.md \
+                         *.py \
+                         *.xml \
+                         *.yaml \
+                         *.yml \
+                         *.xacro \
+                         *.urdf \
+                         *.sdf \
+                         CMakeLists.txt
+USE_MDFILE_AS_MAINPAGE = README.md
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+EXTRACT_ALL            = YES
+QUIET                  = YES
+WARN_IF_UNDOCUMENTED   = NO
+HAVE_DOT               = NO

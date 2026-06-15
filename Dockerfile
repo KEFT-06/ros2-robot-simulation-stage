@@ -26,6 +26,7 @@ ENV QT_X11_NO_MITSHM=1
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash-completion \
     build-essential \
+    doxygen \
     git \
     python3-colcon-common-extensions \
     python3-matplotlib \
