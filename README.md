@@ -168,11 +168,21 @@ Le monde Gazebo contient:
 
 - une surface d'eau visuelle;
 - un ciel et une lumiere adaptes a une scene maritime;
-- le plugin Gazebo Sim `gz::sim::systems::Buoyancy`;
-- une densite d'eau sous `z=0` et une densite d'air au-dessus;
 - aucun obstacle de test.
 
-La flottabilite est une premiere approximation basee sur les volumes de collision. Elle ne remplace pas encore un modele hydrodynamique complet avec trainee, courant et vagues physiques.
+Cette version est volontairement stable: l'eau est visuelle et le bateau repose sur un plan de collision. Elle ne simule pas encore la flottabilite, la trainee, les courants ou les vagues physiques.
+
+La pose initiale du bateau est configurable:
+
+```bash
+ros2 launch mon_robot_bringup simulation.launch.py boat_z:=0.12 boat_pitch:=1.5708
+```
+
+Voir aussi:
+
+```text
+docs/marine_environment.md
+```
 
 ## Envoyer une trajectoire
 

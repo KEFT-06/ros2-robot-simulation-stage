@@ -423,4 +423,11 @@
 
   </ros2_control>
 
+  <gazebo>
+    <plugin filename="gz_ros2_control-system"
+            name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <parameters>$(find mon_robot_bringup)/config/controllers.yaml</parameters>
+    </plugin>
+  </gazebo>
+
 </robot>

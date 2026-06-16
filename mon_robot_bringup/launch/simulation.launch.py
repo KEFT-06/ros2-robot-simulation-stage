@@ -1,12 +1,27 @@
+import os
+
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, TimerAction, ExecuteProcess
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, SetEnvironmentVariable, TimerAction
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import PathJoinSubstitution, Command
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, Command
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
+    description_share = get_package_share_directory('mon_robot_description')
+    gazebo_resource_path = os.path.dirname(description_share)
+
+    boat_x = LaunchConfiguration('boat_x')
+    boat_y = LaunchConfiguration('boat_y')
+    boat_z = LaunchConfiguration('boat_z')
+    boat_roll = LaunchConfiguration('boat_roll')
+    boat_pitch = LaunchConfiguration('boat_pitch')
+    boat_yaw = LaunchConfiguration('boat_yaw')
+    load_controllers = LaunchConfiguration('load_controllers')
+
     # Paths
     urdf_model_path = PathJoinSubstitution([
         FindPackageShare('mon_robot_description'),
@@ -53,13 +68,13 @@ def generate_launch_description():
         executable='create',
         arguments=[
             '-name', 'atawi_3a3',
-            '-x', '0',
-            '-y', '0',
-            '-z', '0.12',
-            '-R', '0',
-            '-P', '1.5708',
-            '-Y', '0',
-            '-file', urdf_model_path
+            '-x', boat_x,
+            '-y', boat_y,
+            '-z', boat_z,
+            '-R', boat_roll,
+            '-P', boat_pitch,
+            '-Y', boat_yaw,
+            '-topic', '/robot_description'
         ],
         output='screen'
     )
@@ -86,7 +101,8 @@ def generate_launch_description():
                 cmd=['ros2', 'control', 'load_controller',
                      '--set-state', 'active',
                      'joint_state_broadcaster'],
-                output='screen'
+                output='screen',
+                condition=IfCondition(load_controllers)
             )
         ]
     )
@@ -99,12 +115,52 @@ def generate_launch_description():
                 cmd=['ros2', 'control', 'load_controller',
                      '--set-state', 'active',
                      'joint_trajectory_controller'],
-                output='screen'
+                output='screen',
+                condition=IfCondition(load_controllers)
             )
         ]
     )
 
     return LaunchDescription([
+        SetEnvironmentVariable(
+            name='GZ_SIM_RESOURCE_PATH',
+            value=gazebo_resource_path
+        ),
+        DeclareLaunchArgument(
+            'boat_x',
+            default_value='0.0',
+            description='Initial boat X position in Gazebo'
+        ),
+        DeclareLaunchArgument(
+            'boat_y',
+            default_value='0.0',
+            description='Initial boat Y position in Gazebo'
+        ),
+        DeclareLaunchArgument(
+            'boat_z',
+            default_value='0.12',
+            description='Initial boat Z position relative to the water surface'
+        ),
+        DeclareLaunchArgument(
+            'boat_roll',
+            default_value='0.0',
+            description='Initial boat roll in radians'
+        ),
+        DeclareLaunchArgument(
+            'boat_pitch',
+            default_value='1.5708',
+            description='Initial boat pitch in radians; adjust if the mesh is not horizontal'
+        ),
+        DeclareLaunchArgument(
+            'boat_yaw',
+            default_value='0.0',
+            description='Initial boat yaw in radians'
+        ),
+        DeclareLaunchArgument(
+            'load_controllers',
+            default_value='false',
+            description='Load ros2_control controllers. Keep false unless gz_ros2_control is confirmed active.'
+        ),
         robot_state_publisher,
         gazebo,
         spawn_robot,
