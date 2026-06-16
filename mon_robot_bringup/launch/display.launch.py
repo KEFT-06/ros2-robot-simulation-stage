@@ -33,6 +33,10 @@ def generate_launch_description():
         package='joint_state_publisher_gui',
         executable='joint_state_publisher_gui',
         name='joint_state_publisher_gui',
+        parameters=[{
+            'robot_description': robot_description,
+            'use_sim_time': use_sim_time
+        }],
         condition=LaunchConfigurationEquals('use_sim_time', 'false')
     )
 
@@ -50,6 +54,7 @@ def generate_launch_description():
         output='screen',
         arguments=['-d', rviz_config_file],
         parameters=[{
+            'robot_description': robot_description,
             'use_sim_time': use_sim_time
         }]
     )

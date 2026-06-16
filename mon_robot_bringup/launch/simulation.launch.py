@@ -55,7 +55,10 @@ def generate_launch_description():
             '-name', 'atawi_3a3',
             '-x', '0',
             '-y', '0',
-            '-z', '0.5',
+            '-z', '0.12',
+            '-R', '0',
+            '-P', '1.5708',
+            '-Y', '0',
             '-file', urdf_model_path
         ],
         output='screen'

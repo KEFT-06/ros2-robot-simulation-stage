@@ -162,7 +162,17 @@ source ~/ros2_ws/install/setup.bash
 ros2 launch mon_robot_bringup simulation.launch.py
 ```
 
-Ce lancement charge le monde SDF et tente de spawn le robot avec les controleurs ROS 2.
+Ce lancement charge le monde SDF aquatique et tente de spawn le robot avec les controleurs ROS 2.
+
+Le monde Gazebo contient:
+
+- une surface d'eau visuelle;
+- un ciel et une lumiere adaptes a une scene maritime;
+- le plugin Gazebo Sim `gz::sim::systems::Buoyancy`;
+- une densite d'eau sous `z=0` et une densite d'air au-dessus;
+- aucun obstacle de test.
+
+La flottabilite est une premiere approximation basee sur les volumes de collision. Elle ne remplace pas encore un modele hydrodynamique complet avec trainee, courant et vagues physiques.
 
 ## Envoyer une trajectoire
 
