@@ -2,7 +2,7 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, SetEnvironmentVariable, TimerAction
+from launch.actions import AppendEnvironmentVariable, DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, TimerAction
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, Command
@@ -122,7 +122,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        SetEnvironmentVariable(
+        AppendEnvironmentVariable(
             name='GZ_SIM_RESOURCE_PATH',
             value=gazebo_resource_path
         ),
