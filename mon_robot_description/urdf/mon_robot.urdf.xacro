@@ -1,6 +1,15 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="atawi_3a3">
 
+  <!-- Mesh URI prefix: package:// for RViz, model:// for Gazebo (resolved via GZ_SIM_RESOURCE_PATH) -->
+  <xacro:arg name="use_gazebo" default="false"/>
+  <xacro:if value="$(arg use_gazebo)">
+    <xacro:property name="mesh_uri" value="model://mon_robot_description/meshes"/>
+  </xacro:if>
+  <xacro:unless value="$(arg use_gazebo)">
+    <xacro:property name="mesh_uri" value="package://mon_robot_description/meshes"/>
+  </xacro:unless>
+
   <!-- Lien fantôme obligatoire -->
   <link name="world"/>
   <joint name="world_to_base" type="fixed">
@@ -14,7 +23,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/Body.stl"
+        <mesh filename="${mesh_uri}/Body.stl"
               scale="1 1 1"/>
       </geometry>
       <material name="grey">
@@ -44,7 +53,7 @@
   <link name="handle1_link">
     <visual>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/Handle_1.stl"
+        <mesh filename="${mesh_uri}/Handle_1.stl"
               scale="1 1 1"/>
       </geometry>
       <material name="dark_grey">
@@ -70,7 +79,7 @@
   <link name="handle2_link">
     <visual>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/Handle_2.stl"
+        <mesh filename="${mesh_uri}/Handle_2.stl"
               scale="1 1 1"/>
       </geometry>
       <material name="dark_grey2">
@@ -96,7 +105,7 @@
   <link name="hexnut1_link">
     <visual>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/Hexnut_1.stl"
+        <mesh filename="${mesh_uri}/Hexnut_1.stl"
               scale="1 1 1"/>
       </geometry>
       <material name="metal">
@@ -118,7 +127,7 @@
   <link name="hexnut2_link">
     <visual>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/Hexnut_2.stl"
+        <mesh filename="${mesh_uri}/Hexnut_2.stl"
               scale="1 1 1"/>
       </geometry>
       <material name="metal2">
@@ -141,7 +150,7 @@
   <link name="vis1_link">
     <visual>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/Vis_1.stl"
+        <mesh filename="${mesh_uri}/Vis_1.stl"
               scale="1 1 1"/>
       </geometry>
       <material name="silver">
@@ -163,7 +172,7 @@
   <link name="vis2_link">
     <visual>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/Vis_2.stl"
+        <mesh filename="${mesh_uri}/Vis_2.stl"
               scale="1 1 1"/>
       </geometry>
       <material name="silver2">
@@ -186,7 +195,7 @@
   <link name="l2_1_link">
     <visual>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/L2_1.stl" scale="1 1 1"/>
+        <mesh filename="${mesh_uri}/L2_1.stl" scale="1 1 1"/>
       </geometry>
       <material name="blue"><color rgba="0.2 0.4 0.8 1"/></material>
     </visual>
@@ -205,7 +214,7 @@
   <link name="l2_2_link">
     <visual>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/L2_2.stl" scale="1 1 1"/>
+        <mesh filename="${mesh_uri}/L2_2.stl" scale="1 1 1"/>
       </geometry>
       <material name="blue2"><color rgba="0.2 0.4 0.8 1"/></material>
     </visual>
@@ -224,7 +233,7 @@
   <link name="l2_3_link">
     <visual>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/L2_3.stl" scale="1 1 1"/>
+        <mesh filename="${mesh_uri}/L2_3.stl" scale="1 1 1"/>
       </geometry>
       <material name="blue3"><color rgba="0.2 0.4 0.8 1"/></material>
     </visual>
@@ -243,7 +252,7 @@
   <link name="l2_4_link">
     <visual>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/L2_4.stl" scale="1 1 1"/>
+        <mesh filename="${mesh_uri}/L2_4.stl" scale="1 1 1"/>
       </geometry>
       <material name="blue4"><color rgba="0.2 0.4 0.8 1"/></material>
     </visual>
@@ -268,7 +277,7 @@
   <link name="head_link">
     <visual>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/part2.stl"
+        <mesh filename="${mesh_uri}/part2.stl"
               scale="1 1 1"/>
       </geometry>
       <material name="blue_head">
@@ -302,7 +311,7 @@
   <link name="rotor_link">
     <visual>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/Blade_1.stl"
+        <mesh filename="${mesh_uri}/Blade_1.stl"
               scale="1 1 1"/>
       </geometry>
       <material name="blade_color">
@@ -328,7 +337,7 @@
   <link name="blade2_link">
     <visual>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/Blade_2.stl" scale="1 1 1"/>
+        <mesh filename="${mesh_uri}/Blade_2.stl" scale="1 1 1"/>
       </geometry>
       <material name="blade2"><color rgba="0.9 0.4 0.1 1"/></material>
     </visual>
@@ -347,7 +356,7 @@
   <link name="blade3_link">
     <visual>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/Blade_3.stl" scale="1 1 1"/>
+        <mesh filename="${mesh_uri}/Blade_3.stl" scale="1 1 1"/>
       </geometry>
       <material name="blade3"><color rgba="0.9 0.4 0.1 1"/></material>
     </visual>
@@ -366,7 +375,7 @@
   <link name="blade4_link">
     <visual>
       <geometry>
-        <mesh filename="package://mon_robot_description/meshes/Blade_4.stl" scale="1 1 1"/>
+        <mesh filename="${mesh_uri}/Blade_4.stl" scale="1 1 1"/>
       </geometry>
       <material name="blade4"><color rgba="0.9 0.4 0.1 1"/></material>
     </visual>
@@ -395,7 +404,8 @@
     </inertial>
   </link>
 
-  <!-- ========== ROS2 CONTROL ========== -->
+  <!-- ========== ROS2 CONTROL (Gazebo uniquement) ========== -->
+  <xacro:if value="$(arg use_gazebo)">
   <ros2_control name="GazeboSystem" type="system">
     <hardware>
       <plugin>gz_ros2_control/GazeboSimSystem</plugin>
@@ -429,5 +439,6 @@
       <parameters>$(find mon_robot_bringup)/config/controllers.yaml</parameters>
     </plugin>
   </gazebo>
+  </xacro:if>
 
 </robot>
