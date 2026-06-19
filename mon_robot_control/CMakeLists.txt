@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.8)
 project(mon_robot_control)
 
 find_package(ament_cmake REQUIRED)
-find_package(rclpy REQUIRED)
-find_package(trajectory_msgs REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 
-# Install Python executables
+ament_python_install_package(${PROJECT_NAME})
+
 install(
   PROGRAMS
     scripts/send_trajectory.py
@@ -16,5 +16,13 @@ install(
     scripts/workspace_visualization.py
   DESTINATION lib/${PROJECT_NAME}
 )
+
+if(BUILD_TESTING)
+  find_package(ament_cmake_pytest REQUIRED)
+  ament_add_pytest_test(test_kinematics test/test_kinematics.py
+    APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR})
+  ament_add_pytest_test(test_trajectory_node test/test_trajectory_node.py
+    APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR})
+endif()
 
 ament_package()

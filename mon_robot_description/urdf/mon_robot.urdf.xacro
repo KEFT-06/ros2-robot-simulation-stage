@@ -3,6 +3,7 @@
 
   <!-- Mesh URI prefix: package:// for RViz, model:// for Gazebo (resolved via GZ_SIM_RESOURCE_PATH) -->
   <xacro:arg name="use_gazebo" default="false"/>
+  <xacro:arg name="controllers_yaml" default=""/>
   <xacro:if value="$(arg use_gazebo)">
     <xacro:property name="mesh_uri" value="model://mon_robot_description/meshes"/>
   </xacro:if>
@@ -436,7 +437,7 @@
   <gazebo>
     <plugin filename="gz_ros2_control-system"
             name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-      <parameters>$(find mon_robot_bringup)/config/controllers.yaml</parameters>
+      <parameters>$(arg controllers_yaml)</parameters>
     </plugin>
   </gazebo>
   </xacro:if>

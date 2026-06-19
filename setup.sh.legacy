@@ -1,0 +1,8 @@
+#!/bin/bash
+# LEGACY — ROS 2 Humble / Ubuntu 22.04 / Gazebo Classic
+# Utiliser README.md (ROS 2 Jazzy) ou Dockerfile a la place.
+
+set -e
+
+echo "Ce script est obsolete. Voir README.md pour ROS 2 Jazzy + Gazebo Harmonic."
+exit 1

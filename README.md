@@ -28,7 +28,7 @@ ros2-robot-simulation-stage/
 │   └── scripts/              # Trajectoires, FK, IK, workspace
 ├── Solidworks/               # Fichiers CAO source
 ├── convert_meshes.py         # Conversion STEP/STL
-└── setup.sh                  # Script d'installation historique
+└── setup.sh.legacy           # Ancien installateur Humble (obsolete)
 ```
 
 ## Packages ROS 2
@@ -37,7 +37,7 @@ ros2-robot-simulation-stage/
 |---|---|
 | `mon_robot_description` | Description du robot: URDF/Xacro, STL, RViz |
 | `mon_robot_bringup` | Launch files, monde SDF, configuration controleurs |
-| `mon_robot_control` | Scripts de trajectoire et validation cinematique |
+| `mon_robot_control` | Trajectoires (action/topic), module `robot_kinematics`, tests pytest |
 
 ## Modele cinematique actuel
 
@@ -66,7 +66,8 @@ sudo apt install -y \
   ros-jazzy-ros-gz-bridge \
   ros-jazzy-gz-ros2-control \
   python3-colcon-common-extensions \
-  python3-matplotlib
+  python3-matplotlib \
+  python3-pytest
 ```
 
 ## Installation dans un workspace ROS 2
@@ -162,7 +163,13 @@ source ~/ros2_ws/install/setup.bash
 ros2 launch mon_robot_bringup simulation.launch.py
 ```
 
-Ce lancement charge le monde SDF aquatique et tente de spawn le robot avec les controleurs ROS 2.
+Ce lancement charge le monde SDF aquatique, spawn le robot via `-string` (URDF xacro) et demarre `gz_ros2_control` avec les spawners `joint_state_broadcaster` + `joint_trajectory_controller` (`load_controllers:=true` par defaut).
+
+Desactiver les controleurs:
+
+```bash
+ros2 launch mon_robot_bringup simulation.launch.py load_controllers:=false
+```
 
 Le monde Gazebo contient:
 
@@ -194,6 +201,12 @@ source ~/ros2_ws/install/setup.bash
 ros2 run mon_robot_control send_trajectory.py home
 ```
 
+Par defaut le script utilise l'action `/joint_trajectory_controller/follow_joint_trajectory`. Mode topic:
+
+```bash
+ros2 run mon_robot_control send_trajectory.py home --ros-args -p use_action:=false
+```
+
 Trajectoires disponibles:
 
 ```bash
@@ -202,6 +215,20 @@ ros2 run mon_robot_control send_trajectory.py sweep
 ros2 run mon_robot_control send_trajectory.py spin
 ros2 run mon_robot_control send_trajectory.py complex
 ros2 run mon_robot_control send_trajectory.py sine
+```
+
+## Tests unitaires
+
+```bash
+cd ~/ros2_ws
+colcon test --packages-select mon_robot_control
+colcon test-result --verbose
+```
+
+Ou apres build:
+
+```bash
+pytest src/ros2-robot-simulation-stage/mon_robot_control/test/
 ```
 
 ## Validation cinematique
@@ -353,12 +380,11 @@ Stories realisees:
 - Bloc `ros2_control`
 - Configuration `controllers.yaml`
 - Launch files
-- Validation FK/IK Python
-- Visualisation de l'espace atteignable
+- Integration Gazebo Harmonic + ros2_control + trajectoires
+- Tests pytest cinématique (`mon_robot_control/test/`)
 
 Travaux restants possibles:
 
-- Finaliser la validation Gazebo avec controleurs
 - Ajouter des capteurs simules
 - Enregistrer une session `rosbag2`
 - Rediger le rapport technique
@@ -367,6 +393,4 @@ Travaux restants possibles:
 ## Licence
 
 MIT
-
-## Api key
 

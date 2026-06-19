@@ -32,7 +32,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-matplotlib \
     python3-numpy \
     python3-pip \
-    python3-rosdep \
+    ros-jazzy-control-msgs \
+    python3-pytest \
     ros-jazzy-gz-ros2-control \
     ros-jazzy-joint-state-broadcaster \
     ros-jazzy-joint-state-publisher-gui \
