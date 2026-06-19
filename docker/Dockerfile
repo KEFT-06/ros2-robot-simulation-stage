@@ -43,7 +43,7 @@ RUN find ${ROS_WS}/src/ros2-robot-simulation-stage/mon_robot_control/scripts \
       -type f -name "*.py" -exec sed -i 's/\r$//' {} \; \
     && chmod +x ${ROS_WS}/src/ros2-robot-simulation-stage/mon_robot_control/scripts/*.py \
     && cp -r ${ROS_WS}/src/ros2-robot-simulation-stage/mon_robot_* ${ROS_WS}/src/ \
-    && python3 ${ROS_WS}/src/ros2-robot-simulation-stage/generate_placeholder_meshes.py
+    && python3 ${ROS_WS}/src/ros2-robot-simulation-stage/mon_robot_description/scripts/generate_placeholder_meshes.py
 
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
     && cd ${ROS_WS} \

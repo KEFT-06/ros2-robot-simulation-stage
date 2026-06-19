@@ -44,7 +44,9 @@ def main():
             '',
         ])
 
-    output = Path.cwd() / 'ik_results.txt'
+    results_dir = Path(__file__).resolve().parent.parent / 'results'
+    results_dir.mkdir(parents=True, exist_ok=True)
+    output = results_dir / 'ik_results.txt'
     output.write_text('\n'.join(lines), encoding='utf-8')
     print(f'\nResultats sauvegardes dans: {output}')
     print('RGS2-22 IK - TERMINE')

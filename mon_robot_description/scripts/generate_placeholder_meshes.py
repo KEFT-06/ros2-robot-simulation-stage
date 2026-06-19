@@ -3,7 +3,7 @@
 
 from pathlib import Path
 
-MESH_DIR = Path(__file__).resolve().parent / 'mon_robot_description' / 'meshes'
+MESH_DIR = Path(__file__).resolve().parent.parent / 'meshes'
 
 FILES = [
     'Body.stl', 'Handle_1.stl', 'Handle_2.stl',

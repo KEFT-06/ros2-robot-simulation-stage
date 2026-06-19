@@ -39,7 +39,7 @@ jobs:
             ros-jazzy-rosbag2
 
       - name: Generate placeholder meshes
-        run: python3 generate_placeholder_meshes.py
+        run: python3 mon_robot_description/scripts/generate_placeholder_meshes.py
 
       - name: Build workspace
         shell: bash

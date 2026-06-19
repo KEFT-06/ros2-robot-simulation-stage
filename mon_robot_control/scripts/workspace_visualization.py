@@ -55,7 +55,9 @@ def main():
     fig.suptitle('Espace atteignable - ATAWI-3A3 URDF 2 DOF')
     plt.tight_layout()
 
-    output = Path.cwd() / 'workspace_3d.png'
+    results_dir = Path(__file__).resolve().parent.parent / 'results'
+    results_dir.mkdir(parents=True, exist_ok=True)
+    output = results_dir / 'workspace_3d.png'
     plt.savefig(output, dpi=150, bbox_inches='tight')
 
     print('STATISTIQUES espace atteignable:')
