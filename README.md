@@ -67,6 +67,7 @@ sudo apt install -y \
   ros-jazzy-gz-ros2-control \
   ros-jazzy-control-msgs \
   ros-jazzy-controller-manager \
+  ros-jazzy-rosbag2 \
   python3-colcon-common-extensions \
   python3-numpy \
   python3-matplotlib \
@@ -144,6 +145,16 @@ docker run --rm -it --net=host \
   -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
   atawi-3a3:jazzy \
   ros2 launch mon_robot_bringup simulation.launch.py
+```
+
+## Demo complete
+
+Voir `docs/demo.md`.
+
+```bash
+python3 generate_placeholder_meshes.py
+colcon build --symlink-install && source install/setup.bash
+ros2 launch mon_robot_bringup demo.launch.py
 ```
 
 ## Lancer RViz
@@ -381,10 +392,11 @@ source /opt/ros/jazzy/setup.bash
 | Module `robot_kinematics` + tests pytest | OK |
 | Deps `package.xml` / README / Docker | OK |
 | Legacy Humble / `gazebo_ros*` | Retire |
-| Meshes STL | A generer (`convert_meshes.py`) |
+| Meshes STL | Placeholder (`generate_placeholder_meshes.py`) ou CAO |
 | Physique marine (flottabilite) | Hors scope volontaire |
-| CI GitHub Actions | Non fait |
-| Capteurs / rosbag2 | Backlog |
+| CI GitHub Actions | OK (`.github/workflows/ci.yml`) |
+| Demo | OK (`docs/demo.md`, `demo.launch.py`) |
+| Capteurs simules | Backlog (hors demo minimale) |
 
 ## Etat du projet
 

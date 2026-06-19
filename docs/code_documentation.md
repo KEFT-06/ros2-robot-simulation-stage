@@ -11,6 +11,8 @@ Ce document complete le README et sert de point d'entree pour la documentation t
 | `mon_robot_bringup/config/controllers.yaml` | Configuration des controleurs |
 | `mon_robot_bringup/launch/display.launch.py` | Lancement RViz |
 | `mon_robot_bringup/launch/simulation.launch.py` | Lancement Gazebo |
+| `mon_robot_bringup/launch/demo.launch.py` | Demo Gazebo + trajectoire + rosbag optionnel |
+| `docs/demo.md` | Procedure demo complete |
 | `mon_robot_control/scripts/send_trajectory.py` | Trajectoires (action/topic) |
 | `mon_robot_control/mon_robot_control/robot_kinematics.py` | Module FK/IK partage |
 | `mon_robot_control/test/` | Tests pytest |

@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    container:
+      image: ros:jazzy-ros-base
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            python3-colcon-common-extensions \
+            python3-pytest \
+            python3-numpy \
+            python3-matplotlib \
+            ros-jazzy-xacro \
+            ros-jazzy-robot-state-publisher \
+            ros-jazzy-joint-state-publisher-gui \
+            ros-jazzy-rviz2 \
+            ros-jazzy-ros2-control \
+            ros-jazzy-ros2-controllers \
+            ros-jazzy-controller-manager \
+            ros-jazzy-joint-state-broadcaster \
+            ros-jazzy-joint-trajectory-controller \
+            ros-jazzy-gz-ros2-control \
+            ros-jazzy-ros-gz-sim \
+            ros-jazzy-ros-gz-bridge \
+            ros-jazzy-control-msgs \
+            ros-jazzy-ament-cmake-python \
+            ros-jazzy-rosbag2
+
+      - name: Generate placeholder meshes
+        run: python3 generate_placeholder_meshes.py
+
+      - name: Build workspace
+        shell: bash
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          mkdir -p /ws/src
+          cp -r mon_robot_description mon_robot_bringup mon_robot_control /ws/src/
+          cd /ws
+          colcon build --symlink-install
+
+      - name: Test
+        shell: bash
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          source /ws/install/setup.bash
+          cd /ws
+          colcon test --packages-select mon_robot_control
+          colcon test-result --verbose
+
+      - name: Lint xacro
+        shell: bash
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          xacro $(ros2 pkg prefix mon_robot_description)/share/mon_robot_description/urdf/mon_robot.urdf.xacro \
+            use_gazebo:=true \
+            controllers_yaml:=$(ros2 pkg prefix mon_robot_bringup)/share/mon_robot_bringup/config/controllers.yaml \
+            > /tmp/robot.urdf
+          test -s /tmp/robot.urdf
