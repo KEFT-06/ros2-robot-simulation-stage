@@ -65,12 +65,17 @@ sudo apt install -y \
   ros-jazzy-ros-gz-sim \
   ros-jazzy-ros-gz-bridge \
   ros-jazzy-gz-ros2-control \
+  ros-jazzy-control-msgs \
+  ros-jazzy-controller-manager \
   python3-colcon-common-extensions \
+  python3-numpy \
   python3-matplotlib \
   python3-pytest
 ```
 
 ## Installation dans un workspace ROS 2
+
+Le dossier `src/` n'est **pas requis dans ce depot** : les 3 paquets sont a la racine et se copient dans `~/ros2_ws/src/` (layout colcon standard cote workspace, pas cote Git).
 
 Depuis Ubuntu ou WSL:
 
@@ -364,6 +369,22 @@ Ces warnings apparaissent souvent apres `rm -rf install` dans un terminal deja s
 ```bash
 source /opt/ros/jazzy/setup.bash
 ```
+
+## Checklist integration
+
+| Point | Statut |
+|---|---|
+| Spawn Gazebo (`-string` URDF) | OK |
+| `controllers_yaml` xacro (plus de `$(find ...)`) | OK |
+| `gz_ros2_control` + spawners JTC/JSB | OK |
+| Action + topic trajectoire | OK |
+| Module `robot_kinematics` + tests pytest | OK |
+| Deps `package.xml` / README / Docker | OK |
+| Legacy Humble / `gazebo_ros*` | Retire |
+| Meshes STL | A generer (`convert_meshes.py`) |
+| Physique marine (flottabilite) | Hors scope volontaire |
+| CI GitHub Actions | Non fait |
+| Capteurs / rosbag2 | Backlog |
 
 ## Etat du projet
 

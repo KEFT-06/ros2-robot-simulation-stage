@@ -33,6 +33,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-numpy \
     python3-pip \
     ros-jazzy-control-msgs \
+    ros-jazzy-controller-manager \
     python3-pytest \
     ros-jazzy-gz-ros2-control \
     ros-jazzy-joint-state-broadcaster \

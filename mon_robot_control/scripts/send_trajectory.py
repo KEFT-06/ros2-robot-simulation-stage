@@ -9,6 +9,7 @@ from builtin_interfaces.msg import Duration
 from control_msgs.action import FollowJointTrajectory
 from rclpy.action import ActionClient
 from rclpy.node import Node
+from rclpy.qos import QoSProfile, ReliabilityPolicy
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 from mon_robot_control.robot_kinematics import RobotKinematics
@@ -18,6 +19,7 @@ class TrajectoryPublisher(Node):
     def __init__(self):
         super().__init__('trajectory_publisher')
 
+        self.declare_parameter('use_sim_time', True)
         self.declare_parameter('use_action', True)
         self.declare_parameter(
             'trajectory_topic',
@@ -37,7 +39,8 @@ class TrajectoryPublisher(Node):
                 self, FollowJointTrajectory, action_name)
         else:
             topic = self.get_parameter('trajectory_topic').value
-            self._publisher = self.create_publisher(JointTrajectory, topic, 10)
+            qos = QoSProfile(depth=10, reliability=ReliabilityPolicy.RELIABLE)
+            self._publisher = self.create_publisher(JointTrajectory, topic, qos)
 
         self.get_logger().info(
             f"Mode={'action' if self.use_action else 'topic'} "

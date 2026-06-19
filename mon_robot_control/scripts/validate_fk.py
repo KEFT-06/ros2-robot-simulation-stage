@@ -12,12 +12,15 @@ import math
 class FKValidator(Node):
     def __init__(self):
         super().__init__('fk_validator')
-        
+        self.declare_parameter('use_sim_time', False)
+        self.declare_parameter('reference_frame', 'base_link')
+        self.declare_parameter('target_frame', 'tool_link')
+
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
-        
-        self.target_frame = 'tool_link'
-        self.reference_frame = 'base_link'
+
+        self.reference_frame = self.get_parameter('reference_frame').value
+        self.target_frame = self.get_parameter('target_frame').value
         
         self.create_timer(1.0, self.check_fk)
 
