@@ -40,6 +40,7 @@ def generate_launch_description():
                 cmd=[
                     'ros2', 'bag', 'record', '-o', 'atawi_demo_bag',
                     '/joint_states', '/tf', '/tf_static', '/clock',
+                    '/model/atawi_3a3/odometry',
                 ],
                 output='screen',
                 condition=IfCondition(record_bag),

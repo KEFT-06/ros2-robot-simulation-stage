@@ -11,13 +11,16 @@
     <xacro:property name="mesh_uri" value="package://mon_robot_description/meshes"/>
   </xacro:unless>
 
-  <!-- Lien fantôme obligatoire -->
-  <link name="world"/>
-  <joint name="world_to_base" type="fixed">
-    <parent link="world"/>
-    <child link="base_link"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-  </joint>
+  <!-- Lien "world" UNIQUEMENT hors Gazebo (RViz a besoin d'un repere fixe).
+       En Gazebo, la base reste LIBRE pour pouvoir flotter (pas de joint fixe). -->
+  <xacro:unless value="$(arg use_gazebo)">
+    <link name="world"/>
+    <joint name="world_to_base" type="fixed">
+      <parent link="world"/>
+      <child link="base_link"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+  </xacro:unless>
 
   <!-- ========== BASE / CORPS PRINCIPAL ========== -->
   <link name="base_link">
@@ -38,7 +41,9 @@
       </geometry>
     </collision>
     <inertial>
-      <origin xyz="0 0 0.097" rpy="0 0 0"/>
+      <!-- Centre de masse abaisse (lestage / quille) : auto-redressement
+           horizontal une fois a flot, comme une bouee. -->
+      <origin xyz="0 0 0.025" rpy="0 0 0"/>
       <mass value="0.5"/>
       <inertia ixx="0.005" ixy="0" ixz="0"
                iyy="0.005" iyz="0" izz="0.002"/>
@@ -438,6 +443,16 @@
     <plugin filename="gz_ros2_control-system"
             name="gz_ros2_control::GazeboSimROS2ControlPlugin">
       <parameters>$(arg controllers_yaml)</parameters>
+    </plugin>
+
+    <!-- Odometrie 3D du bateau (pose monde -> base_link) pour suivre la
+         flottaison et la course temporelle. Publie /model/atawi_3a3/odometry. -->
+    <plugin filename="gz-sim-odometry-publisher-system"
+            name="gz::sim::systems::OdometryPublisher">
+      <dimensions>3</dimensions>
+      <odom_frame>world</odom_frame>
+      <robot_base_frame>base_link</robot_base_frame>
+      <odom_publish_frequency>50</odom_publish_frequency>
     </plugin>
   </gazebo>
   </xacro:if>

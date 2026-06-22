@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
-"""Genere des meshes STL placeholder (boites) pour demo sans CAO."""
+"""Genere des meshes STL placeholder (boites) pour demo sans CAO.
 
+Par defaut, ne genere QUE les meshes manquants : les vrais meshes CAO deja
+presents ne sont jamais ecrases. Utilisez --force pour tout regenerer.
+"""
+
+import sys
 from pathlib import Path
 
 MESH_DIR = Path(__file__).resolve().parent.parent / 'meshes'
@@ -57,12 +62,22 @@ def write_stl(path: Path, sx: float, sy: float, sz: float) -> None:
 
 
 def main() -> None:
+    force = '--force' in sys.argv
     MESH_DIR.mkdir(parents=True, exist_ok=True)
+    created = 0
     for name in FILES:
+        path = MESH_DIR / name
+        if path.exists() and not force:
+            print(f'  conserve (existe deja): {name}')
+            continue
         sx, sy, sz = SIZES.get(name, DEFAULT_SIZE)
-        write_stl(MESH_DIR / name, sx, sy, sz)
-        print(f'  {name}')
-    print(f'OK: {len(FILES)} meshes -> {MESH_DIR}')
+        write_stl(path, sx, sy, sz)
+        created += 1
+        print(f'  genere: {name}')
+    print(f'OK: {created} placeholder(s) genere(s), '
+          f'{len(FILES) - created} mesh(es) conserve(s) -> {MESH_DIR}')
+    if not force and created < len(FILES):
+        print('(--force pour regenerer et ECRASER les meshes existants)')
 
 
 if __name__ == '__main__':

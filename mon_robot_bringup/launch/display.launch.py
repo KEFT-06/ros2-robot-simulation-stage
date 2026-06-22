@@ -1,8 +1,9 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.conditions import LaunchConfigurationEquals
-from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution
+from launch.conditions import IfCondition
+from launch.substitutions import Command, EqualsSubstitution, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
+from launch_ros.descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 
 
@@ -15,7 +16,10 @@ def generate_launch_description():
         'mon_robot.urdf.xacro'
     ])
 
-    robot_description = Command(['xacro ', urdf_model_path])
+    robot_description = ParameterValue(
+        Command(['xacro ', urdf_model_path]),
+        value_type=str,
+    )
 
     # Robot State Publisher
     robot_state_publisher = Node(
@@ -37,7 +41,7 @@ def generate_launch_description():
             'robot_description': robot_description,
             'use_sim_time': use_sim_time
         }],
-        condition=LaunchConfigurationEquals('use_sim_time', 'false')
+        condition=IfCondition(EqualsSubstitution(use_sim_time, 'false'))
     )
 
     # RViz2

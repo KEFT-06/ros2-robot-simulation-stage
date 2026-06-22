@@ -2,8 +2,9 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import AppendEnvironmentVariable, DeclareLaunchArgument, IncludeLaunchDescription, TimerAction
+from launch.actions import AppendEnvironmentVariable, DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler
 from launch.conditions import IfCondition
+from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
@@ -65,7 +66,7 @@ def generate_launch_description():
                 'gz_sim.launch.py',
             ]),
         ]),
-        launch_arguments={'gz_args': [world_path, ' -v 4']}.items(),
+        launch_arguments={'gz_args': ['-r -v 4 ', world_path]}.items(),
     )
 
     spawn_robot = Node(
@@ -79,15 +80,19 @@ def generate_launch_description():
             '-R', boat_roll,
             '-P', boat_pitch,
             '-Y', boat_yaw,
-            '-string', robot_description,
+            '-topic', 'robot_description',   # ← remplace -string
         ],
         output='screen',
+        
     )
 
-    clock_bridge = Node(
+    bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
-        arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
+        arguments=[
+            '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
+            '/model/atawi_3a3/odometry@nav_msgs/msg/Odometry[gz.msgs.Odometry',
+        ],
         output='screen',
     )
 
@@ -107,9 +112,13 @@ def generate_launch_description():
         condition=IfCondition(load_controllers),
     )
 
-    delayed_controllers = TimerAction(
-        period=5.0,
-        actions=[joint_state_broadcaster_spawner, joint_trajectory_controller_spawner],
+    # Demarre les controleurs des que le spawn du robot est termine (robuste,
+    # vs un delai fixe qui echoue sur machine lente / 1er lancement Gazebo).
+    controllers_after_spawn = RegisterEventHandler(
+        OnProcessExit(
+            target_action=spawn_robot,
+            on_exit=[joint_state_broadcaster_spawner, joint_trajectory_controller_spawner],
+        )
     )
 
     return LaunchDescription([
@@ -119,9 +128,12 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument('boat_x', default_value='0.0'),
         DeclareLaunchArgument('boat_y', default_value='0.0'),
-        DeclareLaunchArgument('boat_z', default_value='0.12'),
+        # Spawn proche de l'equilibre de flottaison (~ -0.11 m, calcule depuis la
+        # masse ~0.79 kg et la section de coque) pour minimiser le rebond initial.
+        DeclareLaunchArgument('boat_z', default_value='-0.1'),
         DeclareLaunchArgument('boat_roll', default_value='0.0'),
-        DeclareLaunchArgument('boat_pitch', default_value='1.5708'),
+        # Horizontal (pitch=0). L'ancienne valeur 1.5708 mettait le bateau a la verticale.
+        DeclareLaunchArgument('boat_pitch', default_value='0.0'),
         DeclareLaunchArgument('boat_yaw', default_value='0.0'),
         DeclareLaunchArgument(
             'load_controllers',
@@ -131,6 +143,6 @@ def generate_launch_description():
         robot_state_publisher,
         gazebo,
         spawn_robot,
-        clock_bridge,
-        delayed_controllers,
+        bridge,
+        controllers_after_spawn,
     ])

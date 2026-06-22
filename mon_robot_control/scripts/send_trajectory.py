@@ -19,13 +19,12 @@ class TrajectoryPublisher(Node):
     def __init__(self):
         super().__init__('trajectory_publisher')
 
-        self.declare_parameter('use_sim_time', True)
-        self.declare_parameter('use_action', True)
-        self.declare_parameter(
+        self._declare_parameter('use_action', True)
+        self._declare_parameter(
             'trajectory_topic',
             '/joint_trajectory_controller/joint_trajectory',
         )
-        self.declare_parameter(
+        self._declare_parameter(
             'action_name',
             '/joint_trajectory_controller/follow_joint_trajectory',
         )
@@ -46,6 +45,16 @@ class TrajectoryPublisher(Node):
             f"Mode={'action' if self.use_action else 'topic'} "
             f'joints={self.joint_names}'
         )
+
+    def _declare_parameter(self, name, default):
+        """Declare un parametre seulement s'il ne l'est pas deja.
+
+        Evite ParameterAlreadyDeclaredException quand le parametre a deja ete
+        injecte (ex: use_sim_time fourni par le launch ou auto-declare rclpy).
+        """
+        if not self.has_parameter(name):
+            self.declare_parameter(name, default)
+        return self.get_parameter(name).value
 
     def _build_waypoints(self, waypoints, time_from_start):
         if time_from_start is None:

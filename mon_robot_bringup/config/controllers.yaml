@@ -40,16 +40,6 @@ joint_trajectory_controller:
         trajectory: 0.05
         goal: 0.05
 
-    gains:
-      joint1_head:
-        p: 80.0
-        i: 0.01
-        d: 8.0
-        i_clamp_max: 1.0
-        i_clamp_min: -1.0
-      joint2_rotor:
-        p: 40.0
-        i: 0.005
-        d: 4.0
-        i_clamp_max: 0.5
-        i_clamp_min: -0.5
+    # Pas de bloc 'gains' : avec une command_interface 'position', le
+    # JointTrajectoryController transmet les positions directement et ignore
+    # tout PID. (Ajouter 'gains' seulement si on passe a une interface effort.)

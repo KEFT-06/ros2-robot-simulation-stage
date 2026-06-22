@@ -192,8 +192,8 @@ Les deux axes de rotation sont coaxiaux autour de Z.
 
 | Link | Rôle |
 |---|---|
-| `world` | Repère fixe global |
-| `base_link` | Corps principal du robot |
+| `world` | Repère fixe global — **présent uniquement hors Gazebo** (RViz). En simulation, la base est libre pour flotter. |
+| `base_link` | Corps principal du robot (racine en simulation) |
 | `head_link` | Tête orientable |
 | `rotor_link` | Rotor / support des pales |
 | `tool_link` | Repère effecteur final |
@@ -202,7 +202,7 @@ Les deux axes de rotation sont coaxiaux autour de Z.
 
 Les pièces suivantes sont montées par joints fixes :
 
-- `world_to_base`, `handle1_joint`, `handle2_joint`
+- `world_to_base` (**RViz uniquement**, via `xacro:unless use_gazebo`), `handle1_joint`, `handle2_joint`
 - `hexnut1_joint`, `hexnut2_joint`, `vis1_joint`, `vis2_joint`
 - `l2_1_joint`, `l2_2_joint`, `l2_3_joint`, `l2_4_joint`
 - `blade2_joint`, `blade3_joint`, `blade4_joint`, `tool_joint`
@@ -309,10 +309,13 @@ Monde principal : `mon_robot_bringup/worlds/robot_world.sdf`
 
 Contenu :
 
-- surface d'eau visuelle `water_surface` ;
+- plugins système Gazebo Harmonic : `Physics`, `SceneBroadcaster`, `UserCommands` ;
+- **flottaison réelle** via le plugin `Buoyancy` gradué (surface d'eau à `z=0`, eau 1000 kg/m³, air ~1,2 kg/m³) ;
+- surface d'eau **purement visuelle** `water_surface` (aucune collision : la portance vient du plugin Buoyancy) ;
 - lignes de vague visuelles `wave_lines` ;
-- ciel et éclairage adaptés à une scène maritime ;
-- aucun obstacle de test.
+- ciel et éclairage adaptés à une scène maritime.
+
+Le bateau a une base **libre** (pas de joint fixe vers `world`) et un centre de masse abaissé (lestage) : il se stabilise **horizontalement** à la surface, comme une bouée.
 
 ### Ajuster la pose du bateau
 
@@ -320,29 +323,30 @@ Contenu :
 ros2 launch mon_robot_bringup simulation.launch.py \
   boat_x:=0.0 \
   boat_y:=0.0 \
-  boat_z:=0.12 \
+  boat_z:=-0.1 \
   boat_roll:=0.0 \
-  boat_pitch:=1.5708 \
+  boat_pitch:=0.0 \
   boat_yaw:=0.0
 ```
 
-Exemples :
+Le bateau est spawné proche de son équilibre de flottaison (`boat_z:=-0.1`, soit la coque à moitié immergée) pour se stabiliser sans rebondir. `boat_pitch:=0.0` le pose à l'horizontale (l'ancien défaut `1.5708` le mettait à la verticale). Si le bateau s'enfonce ou émerge trop, ajustez `boat_z` de quelques centimètres.
+
+### Course temporelle
+
+`demo.launch.py` enchaîne : simulation → chargement des contrôleurs (sur fin du spawn) → trajectoire chronométrée → enregistrement rosbag de `/joint_states`, `/tf`, `/clock` et de l'odométrie 3D `/model/atawi_3a3/odometry` (pose du bateau dans le temps).
 
 ```bash
-ros2 launch mon_robot_bringup simulation.launch.py boat_pitch:=0.0
-ros2 launch mon_robot_bringup simulation.launch.py boat_pitch:=1.5708
-ros2 launch mon_robot_bringup simulation.launch.py boat_z:=0.08
+ros2 launch mon_robot_bringup demo.launch.py record_bag:=true run_trajectory:=true
+# Ctrl+C, puis :
+ros2 bag info atawi_demo_bag
 ```
 
 ### Limites actuelles
 
-Cette version est volontairement stable :
+- flottaison statique (poussée d'Archimède) **sans** courants, vagues physiques ni traînée hydrodynamique calibrée ;
+- pas de modèle hydrodynamique de Fossen (amortissement visqueux) : le bateau peut osciller/dériver lentement en lacet sous le couple de réaction des articulations.
 
-- l'eau est **visuelle** ;
-- le bateau repose sur un plan de collision ;
-- **pas** de flottabilité, courants, vagues physiques ou traînée hydrodynamique calibrée.
-
-Pour une simulation navale avancée, il faudra ajouter un modèle hydrodynamique dédié et vérifier les plugins disponibles dans Gazebo Harmonic.
+Pour une simulation navale avancée, ajouter le plugin `Hydrodynamics` de Gazebo Harmonic avec des coefficients calibrés.
 
 ---
 
@@ -628,15 +632,17 @@ Sortie : `docs/doxygen/html/index.html`
 
 | Point | Statut |
 |---|---|
-| Spawn Gazebo (`-string` URDF) | OK |
+| Spawn Gazebo (`-topic robot_description`) | OK |
 | `controllers_yaml` xacro | OK |
-| `gz_ros2_control` + spawners JTC/JSB | OK |
+| `gz_ros2_control` + spawners JTC/JSB (sur événement) | OK |
 | Action + topic trajectoire | OK |
 | Module `robot_kinematics` + tests pytest | OK |
 | Deps `package.xml` / Docker | OK |
 | Legacy Humble / `gazebo_ros*` | Retiré |
-| Meshes STL | Placeholder ou CAO |
-| Physique marine (flottabilité) | Hors scope volontaire |
+| Meshes STL | Placeholder (non destructif) ou CAO |
+| Flottaison horizontale (plugin Buoyancy) | OK |
+| Odométrie 3D du bateau | OK (`/model/atawi_3a3/odometry`) |
+| Hydrodynamique (courants, traînée) | Hors scope volontaire |
 | CI GitHub Actions | OK |
 | Démo | OK (`demo.launch.py`) |
 | Capteurs simulés | Backlog |

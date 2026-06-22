@@ -48,10 +48,11 @@ class RobotKinematics:
 
     @classmethod
     def workspace_yaw_samples(cls, n=32):
-        q1_vals = [cls.Q_MIN[0] + i * (cls.Q_MAX[0] - cls.Q_MIN[0]) / (n - 1) for i in range(n)]
-        q2_vals = [cls.Q_MIN[1] + i * (cls.Q_MAX[1] - cls.Q_MIN[1]) / (n - 1) for i in range(n)]
         yaws = set()
-        for q1 in q1_vals:
-            for q2 in q2_vals:
-                yaws.add(round(cls.forward_kinematics_yaw([q1, q2]), 6))
+        step = (cls.Q_MAX[0] - cls.Q_MIN[0]) / (n - 1)
+        for i in range(n):
+            q = cls.Q_MIN[0] + i * step
+            yaws.add(round(cls.forward_kinematics_yaw([q, 0.0]), 6))
+            yaws.add(round(cls.forward_kinematics_yaw([0.0, q]), 6))
+            yaws.add(round(cls.forward_kinematics_yaw([q, q]), 6))
         return sorted(yaws)
