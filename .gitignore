@@ -49,3 +49,6 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+
+# Graphify knowledge graph output
+graphify-out/

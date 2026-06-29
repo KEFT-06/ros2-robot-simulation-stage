@@ -1,0 +1,12 @@
+# Depot edite sous Windows mais execute sous Linux/ROS 2.
+# On force LF pour tous les fichiers texte : sinon les shebangs (#!/usr/bin/env python3)
+# se retrouvent avec un \r et cassent ("python3\r: No such file or directory").
+* text=auto eol=lf
+
+# Assets binaires : ne jamais convertir
+*.stl binary
+*.STL binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pcd binary
