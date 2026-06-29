@@ -13,18 +13,8 @@
     <plugin filename="gz-sim-scene-broadcaster-system"
             name="gz::sim::systems::SceneBroadcaster"/>
 
-    <!-- Flottaison reelle : surface d'eau a z=0. En dessous = eau (1000 kg/m3),
-         au-dessus = air (~1.2 kg/m3). Les corps non statiques flottent a l'equilibre. -->
-    <plugin filename="gz-sim-buoyancy-system"
-            name="gz::sim::systems::Buoyancy">
-      <graded_buoyancy>
-        <default_density>1000</default_density>
-        <density_change>
-          <above_depth>0</above_depth>
-          <density>1.2</density>
-        </density_change>
-      </graded_buoyancy>
-    </plugin>
+    <!-- Pas de plugin Buoyancy : le bateau est FIXE au monde (URDF: world_to_hull),
+         pose a plat sur l'eau et immobile. La surface d'eau reste purement visuelle. -->
 
     <!-- ======================== PHYSICS ======================== -->
     <!-- Le moteur (dartsim par defaut) est choisi par le plugin Physics ci-dessus. -->

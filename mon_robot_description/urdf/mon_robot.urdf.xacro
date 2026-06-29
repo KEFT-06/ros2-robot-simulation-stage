@@ -4,6 +4,10 @@
   <!-- Mesh URI prefix: package:// for RViz, model:// for Gazebo (resolved via GZ_SIM_RESOURCE_PATH) -->
   <xacro:arg name="use_gazebo" default="false"/>
   <xacro:arg name="controllers_yaml" default=""/>
+
+  <!-- Facteur d'echelle global du device. Changez cette seule valeur pour
+       redimensionner tout le robot (meshes + collisions + offsets). -->
+  <xacro:property name="s" value="10.0"/>
   <xacro:if value="$(arg use_gazebo)">
     <xacro:property name="mesh_uri" value="model://mon_robot_description/meshes"/>
   </xacro:if>
@@ -11,26 +15,24 @@
     <xacro:property name="mesh_uri" value="package://mon_robot_description/meshes"/>
   </xacro:unless>
 
-  <!-- Lien "world" UNIQUEMENT hors Gazebo (RViz a besoin d'un repere fixe).
-       En Gazebo, la COQUE (hull_link) reste LIBRE pour pouvoir flotter. -->
-  <xacro:unless value="$(arg use_gazebo)">
-    <link name="world"/>
-    <joint name="world_to_hull" type="fixed">
-      <parent link="world"/>
-      <child link="hull_link"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-    </joint>
-  </xacro:unless>
+  <!-- Bateau FIXE au monde : pose a plat sur l'eau et IMMOBILE tant qu'aucune
+       trajectoire n'est commandee (seuls joint1_head/joint2_rotor bougent).
+       Le lien "world" sert aussi de repere fixe en RViz.
+       world_to_hull origin z : hauteur de la coque par rapport a l'eau (z=0). -->
+  <link name="world"/>
+  <joint name="world_to_hull" type="fixed">
+    <parent link="world"/>
+    <child link="hull_link"/>
+    <origin xyz="0 0 0.15" rpy="0 0 0"/>
+  </joint>
 
-  <!-- ========== COQUE FLOTTANTE (corps racine, large et plat) ==========
-       Box large >> haute => flottaison stable a plat. Toute la portance vient
-       d'ici (le plugin Buoyancy gradue ne supporte que box/sphere). Le device
-       est pose dessus, a l'horizontale, au-dessus de l'eau. -->
+  <!-- ========== COQUE (corps porteur, large et plat) ==========
+       Posee a plat sur l'eau, dimensionnee pour porter le device (x10). -->
   <link name="hull_link">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.70 0.36 0.12"/>
+        <box size="2.4 1.2 0.4"/>
       </geometry>
       <material name="hull">
         <color rgba="0.15 0.20 0.30 1"/>
@@ -39,25 +41,24 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.70 0.36 0.12"/>
+        <box size="2.4 1.2 0.4"/>
       </geometry>
     </collision>
     <inertial>
-      <!-- Masse principale, CoM bas (lestage) => auto-redressement a plat -->
-      <origin xyz="0 0 -0.04" rpy="0 0 0"/>
-      <mass value="10.0"/>
-      <inertia ixx="0.12" ixy="0" ixz="0"
-               iyy="0.42" iyz="0" izz="0.52"/>
+      <origin xyz="0 0 -0.10" rpy="0 0 0"/>
+      <mass value="50.0"/>
+      <inertia ixx="6.7" ixy="0" ixz="0"
+               iyy="24.7" iyz="0" izz="30.0"/>
     </inertial>
   </link>
 
   <!-- Robot couche a l'horizontale et pose sur le pont de la coque.
-       rpy="0 -pi/2 0" : l'axe long du device (+Z) pointe vers l'avant (+X),
-       l'helice (joint2_rotor) tourne alors autour de l'axe d'avance. -->
+       rpy="0 -pi/2 0" : l'axe long du device (+Z) pointe vers l'avant (+X).
+       Ajustez l'origin xyz pour repositionner le robot sur le pont. -->
   <joint name="hull_to_base" type="fixed">
     <parent link="hull_link"/>
     <child link="base_link"/>
-    <origin xyz="-0.20 0 0.12" rpy="0 -1.5708 0"/>
+    <origin xyz="-0.7 0 0.45" rpy="0 -1.5708 0"/>
   </joint>
 
   <!-- ========== BASE / CORPS PRINCIPAL (device, pose sur la coque) ========== -->
@@ -66,7 +67,7 @@
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
         <mesh filename="${mesh_uri}/Body.stl"
-              scale="3 3 3"/>
+              scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="grey">
         <color rgba="0.6 0.6 0.6 1"/>
@@ -90,14 +91,14 @@
     <visual>
       <geometry>
         <mesh filename="${mesh_uri}/Handle_1.stl"
-              scale="3 3 3"/>
+              scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="dark_grey">
         <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
-      <geometry><box size="0.030 0.024 0.075"/></geometry>
+      <geometry><box size="${0.010*s} ${0.008*s} ${0.025*s}"/></geometry>
     </collision>
     <inertial>
       <mass value="0.02"/>
@@ -116,14 +117,14 @@
     <visual>
       <geometry>
         <mesh filename="${mesh_uri}/Handle_2.stl"
-              scale="3 3 3"/>
+              scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="dark_grey2">
         <color rgba="0.3 0.3 0.3 1"/>
       </material>
     </visual>
     <collision>
-      <geometry><box size="0.030 0.024 0.075"/></geometry>
+      <geometry><box size="${0.010*s} ${0.008*s} ${0.025*s}"/></geometry>
     </collision>
     <inertial>
       <mass value="0.02"/>
@@ -142,7 +143,7 @@
     <visual>
       <geometry>
         <mesh filename="${mesh_uri}/Hexnut_1.stl"
-              scale="3 3 3"/>
+              scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="metal">
         <color rgba="0.8 0.7 0.2 1"/>
@@ -164,7 +165,7 @@
     <visual>
       <geometry>
         <mesh filename="${mesh_uri}/Hexnut_2.stl"
-              scale="3 3 3"/>
+              scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="metal2">
         <color rgba="0.8 0.7 0.2 1"/>
@@ -187,7 +188,7 @@
     <visual>
       <geometry>
         <mesh filename="${mesh_uri}/Vis_1.stl"
-              scale="3 3 3"/>
+              scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="silver">
         <color rgba="0.75 0.75 0.75 1"/>
@@ -209,7 +210,7 @@
     <visual>
       <geometry>
         <mesh filename="${mesh_uri}/Vis_2.stl"
-              scale="3 3 3"/>
+              scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="silver2">
         <color rgba="0.75 0.75 0.75 1"/>
@@ -231,7 +232,7 @@
   <link name="l2_1_link">
     <visual>
       <geometry>
-        <mesh filename="${mesh_uri}/L2_1.stl" scale="3 3 3"/>
+        <mesh filename="${mesh_uri}/L2_1.stl" scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="blue"><color rgba="0.2 0.4 0.8 1"/></material>
     </visual>
@@ -250,7 +251,7 @@
   <link name="l2_2_link">
     <visual>
       <geometry>
-        <mesh filename="${mesh_uri}/L2_2.stl" scale="3 3 3"/>
+        <mesh filename="${mesh_uri}/L2_2.stl" scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="blue2"><color rgba="0.2 0.4 0.8 1"/></material>
     </visual>
@@ -269,7 +270,7 @@
   <link name="l2_3_link">
     <visual>
       <geometry>
-        <mesh filename="${mesh_uri}/L2_3.stl" scale="3 3 3"/>
+        <mesh filename="${mesh_uri}/L2_3.stl" scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="blue3"><color rgba="0.2 0.4 0.8 1"/></material>
     </visual>
@@ -288,7 +289,7 @@
   <link name="l2_4_link">
     <visual>
       <geometry>
-        <mesh filename="${mesh_uri}/L2_4.stl" scale="3 3 3"/>
+        <mesh filename="${mesh_uri}/L2_4.stl" scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="blue4"><color rgba="0.2 0.4 0.8 1"/></material>
     </visual>
@@ -314,7 +315,7 @@
     <visual>
       <geometry>
         <mesh filename="${mesh_uri}/part2.stl"
-              scale="3 3 3"/>
+              scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="blue_head">
         <color rgba="0.2 0.4 0.9 1"/>
@@ -323,7 +324,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="0.303 0.129 0.117"/>
+        <box size="${0.101*s} ${0.043*s} ${0.039*s}"/>
       </geometry>
     </collision>
     <inertial>
@@ -348,14 +349,14 @@
     <visual>
       <geometry>
         <mesh filename="${mesh_uri}/Blade_1.stl"
-              scale="3 3 3"/>
+              scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="blade_color">
         <color rgba="0.9 0.4 0.1 1"/>
       </material>
     </visual>
     <collision>
-      <geometry><cylinder radius="0.045" length="0.018"/></geometry>
+      <geometry><cylinder radius="${0.015*s}" length="${0.006*s}"/></geometry>
     </collision>
     <inertial>
       <mass value="0.05"/>
@@ -373,7 +374,7 @@
   <link name="blade2_link">
     <visual>
       <geometry>
-        <mesh filename="${mesh_uri}/Blade_2.stl" scale="3 3 3"/>
+        <mesh filename="${mesh_uri}/Blade_2.stl" scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="blade2"><color rgba="0.9 0.4 0.1 1"/></material>
     </visual>
@@ -392,7 +393,7 @@
   <link name="blade3_link">
     <visual>
       <geometry>
-        <mesh filename="${mesh_uri}/Blade_3.stl" scale="3 3 3"/>
+        <mesh filename="${mesh_uri}/Blade_3.stl" scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="blade3"><color rgba="0.9 0.4 0.1 1"/></material>
     </visual>
@@ -411,7 +412,7 @@
   <link name="blade4_link">
     <visual>
       <geometry>
-        <mesh filename="${mesh_uri}/Blade_4.stl" scale="3 3 3"/>
+        <mesh filename="${mesh_uri}/Blade_4.stl" scale="${s} ${s} ${s}"/>
       </geometry>
       <material name="blade4"><color rgba="0.9 0.4 0.1 1"/></material>
     </visual>
@@ -426,11 +427,11 @@
   <joint name="tool_joint" type="fixed">
     <parent link="rotor_link"/>
     <child link="tool_link"/>
-    <origin xyz="0 0 0.030" rpy="0 0 0"/>
+    <origin xyz="0 0 ${0.010*s}" rpy="0 0 0"/>
   </joint>
   <link name="tool_link">
     <visual>
-      <geometry><sphere radius="0.015"/></geometry>
+      <geometry><sphere radius="${0.005*s}"/></geometry>
       <material name="red"><color rgba="1 0 0 1"/></material>
     </visual>
     <inertial>

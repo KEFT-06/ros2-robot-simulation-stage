@@ -315,21 +315,15 @@ Contenu :
 - lignes de vague visuelles `wave_lines` ;
 - ciel et éclairage adaptés à une scène maritime.
 
-**Coque flottante.** Le corps racine est `hull_link` : une **coque large et plate** (`0.70 × 0.36 × 0.12 m`, masse ~10 kg, centre de masse bas). Comme elle est bien plus large que haute, elle flotte **stablement à l'horizontale** (le plugin `Buoyancy` ne gère que les collisions `box`/`sphere` — d'où le choix d'une coque box). Le robot ATAWI-3A3 (agrandi **×3**, ~0.57 m) est **couché à l'horizontale** et posé sur le pont via le joint fixe `hull_to_base` (`rpy="0 -π/2 0"`), l'hélice tournant autour de l'axe d'avance.
+**Coque fixe, à plat sur l'eau.** Le corps racine est `hull_link` : une **coque large et plate** (`2.4 × 1.2 × 0.4 m`). Elle est **fixée au monde** (joint `world_to_hull`) → le bateau est **parfaitement à plat et immobile** ; il ne bouge **que** lorsqu'on commande une trajectoire (seuls `joint1_head` et `joint2_rotor` sont mobiles). Le robot ATAWI-3A3 est **couché à l'horizontale** sur le pont via le joint fixe `hull_to_base` (`rpy="0 -π/2 0"`).
+
+La taille du robot est pilotée par une **propriété xacro unique** `s` (facteur d'échelle, **×10** par défaut) dans `mon_robot.urdf.xacro` : changez cette seule valeur pour redimensionner tout le device. Le plugin `Buoyancy` a été retiré (inutile pour un bateau fixe).
 
 ### Ajuster la pose du bateau
 
-```bash
-ros2 launch mon_robot_bringup simulation.launch.py \
-  boat_x:=0.0 \
-  boat_y:=0.0 \
-  boat_z:=0.05 \
-  boat_roll:=0.0 \
-  boat_pitch:=0.0 \
-  boat_yaw:=0.0
-```
-
-La coque est spawnée juste au-dessus de l'eau (`boat_z:=0.05`) ; elle tombe et se stabilise à flot (équilibre ~ +0,02 m, environ 35 % immergée). Si elle s'enfonce ou émerge trop, ajustez `boat_z` de quelques centimètres ou la masse de `hull_link`.
+- **Hauteur sur l'eau** : `origin z` du joint `world_to_hull` (par défaut `0.15`).
+- **Position du robot sur le pont** : `origin xyz` du joint `hull_to_base`.
+- **Taille** : propriété `s` (×10).
 
 ### Course temporelle
 
