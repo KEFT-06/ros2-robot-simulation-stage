@@ -311,11 +311,11 @@ Contenu :
 
 - plugins système Gazebo Harmonic : `Physics`, `SceneBroadcaster`, `UserCommands` ;
 - **flottaison réelle** via le plugin `Buoyancy` gradué (surface d'eau à `z=0`, eau 1000 kg/m³, air ~1,2 kg/m³) ;
-- surface d'eau **purement visuelle** `water_surface` (aucune collision : la portance vient du plugin Buoyancy) ;
+- surface d'eau **purement visuelle** `water_surface` (aucune collision : la portance vient du plugin Buoyancy), teinte mer turquoise + rendu PBR ;
 - lignes de vague visuelles `wave_lines` ;
 - ciel et éclairage adaptés à une scène maritime.
 
-Le bateau a une base **libre** (pas de joint fixe vers `world`) et un centre de masse abaissé (lestage) : il se stabilise **horizontalement** à la surface, comme une bouée.
+**Coque flottante.** Le corps racine est `hull_link` : une **coque large et plate** (`0.70 × 0.36 × 0.12 m`, masse ~10 kg, centre de masse bas). Comme elle est bien plus large que haute, elle flotte **stablement à l'horizontale** (le plugin `Buoyancy` ne gère que les collisions `box`/`sphere` — d'où le choix d'une coque box). Le robot ATAWI-3A3 (agrandi **×3**, ~0.57 m) est **couché à l'horizontale** et posé sur le pont via le joint fixe `hull_to_base` (`rpy="0 -π/2 0"`), l'hélice tournant autour de l'axe d'avance.
 
 ### Ajuster la pose du bateau
 
@@ -323,13 +323,13 @@ Le bateau a une base **libre** (pas de joint fixe vers `world`) et un centre de 
 ros2 launch mon_robot_bringup simulation.launch.py \
   boat_x:=0.0 \
   boat_y:=0.0 \
-  boat_z:=-0.1 \
+  boat_z:=0.05 \
   boat_roll:=0.0 \
   boat_pitch:=0.0 \
   boat_yaw:=0.0
 ```
 
-Le bateau est spawné proche de son équilibre de flottaison (`boat_z:=-0.1`, soit la coque à moitié immergée) pour se stabiliser sans rebondir. `boat_pitch:=0.0` le pose à l'horizontale (l'ancien défaut `1.5708` le mettait à la verticale). Si le bateau s'enfonce ou émerge trop, ajustez `boat_z` de quelques centimètres.
+La coque est spawnée juste au-dessus de l'eau (`boat_z:=0.05`) ; elle tombe et se stabilise à flot (équilibre ~ +0,02 m, environ 35 % immergée). Si elle s'enfonce ou émerge trop, ajustez `boat_z` de quelques centimètres ou la masse de `hull_link`.
 
 ### Course temporelle
 

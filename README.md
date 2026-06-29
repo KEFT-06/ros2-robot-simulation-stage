@@ -21,6 +21,8 @@ Toute la documentation du projet se trouve dans un seul fichier :
 
 Installation, cinématique, Gazebo, trajectoires, validation FK/IK, Docker, CI, dépannage.
 
+Toutes les commandes de lancement (RViz, Gazebo, trajectoires, démo, tests) sont regroupées dans **[docs/COMMANDES.md](docs/COMMANDES.md)**.
+
 ## Packages
 
 | Package | Rôle |

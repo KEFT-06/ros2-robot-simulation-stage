@@ -128,11 +128,12 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument('boat_x', default_value='0.0'),
         DeclareLaunchArgument('boat_y', default_value='0.0'),
-        # Spawn proche de l'equilibre de flottaison (~ -0.11 m, calcule depuis la
-        # masse ~0.79 kg et la section de coque) pour minimiser le rebond initial.
-        DeclareLaunchArgument('boat_z', default_value='-0.1'),
+        # Spawn la coque juste au-dessus de l'eau : elle tombe et se stabilise a flot
+        # (equilibre ~ +0.02 m). Ajustez de quelques cm si elle s'enfonce/emerge trop.
+        DeclareLaunchArgument('boat_z', default_value='0.05'),
+        # roll=pitch=yaw=0 : la coque large flotte a plat d'elle-meme, le robot est
+        # deja couche a l'horizontale dans l'URDF (joint hull_to_base).
         DeclareLaunchArgument('boat_roll', default_value='0.0'),
-        # Horizontal (pitch=0). L'ancienne valeur 1.5708 mettait le bateau a la verticale.
         DeclareLaunchArgument('boat_pitch', default_value='0.0'),
         DeclareLaunchArgument('boat_yaw', default_value='0.0'),
         DeclareLaunchArgument(
