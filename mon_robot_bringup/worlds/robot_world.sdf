@@ -115,13 +115,12 @@
     </light>
 
     <!-- ======================== WATER SURFACE ======================== -->
-    <!-- Plan d'eau purement visuel. La flottaison est geree par le plugin Buoyancy. -->
+    <!-- Plan d'eau purement visuel. La pose du bateau est fixee dans l'URDF. -->
     <model name="water_surface">
       <static>true</static>
       <pose>0 0 0 0 0 0</pose>
       <link name="water_link">
-        <!-- Pas de collision : la surface est PUREMENT visuelle. La portance est
-             assuree par le plugin Buoyancy (surface a z=0), pas par un plan solide. -->
+        <!-- Pas de collision : la surface reste uniquement visuelle. -->
         <visual name="water_visual">
           <geometry>
             <plane>
