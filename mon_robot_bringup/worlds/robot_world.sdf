@@ -61,6 +61,13 @@
         <iterations>true</iterations>
       </plugin>
       <plugin filename="EntityTree" name="Entity tree"/>
+      <plugin filename="EntityContextMenuPlugin" name="Entity Context Menu"/>
+      <plugin filename="ComponentInspector" name="Component inspector"/>
+      <plugin filename="TransformControl" name="Transform control"/>
+      <plugin filename="Shapes" name="Shapes"/>
+      <plugin filename="Lights" name="Lights"/>
+      <plugin filename="CopyPaste" name="Copy/Paste"/>
+      <plugin filename="Screenshot" name="Screenshot"/>
     </gui>
 
     <!-- ======================== SYSTEM PLUGINS (Gazebo Harmonic) ======================== -->
