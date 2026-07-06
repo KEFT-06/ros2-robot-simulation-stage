@@ -7,9 +7,11 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
+    bag_name = LaunchConfiguration('bag_name')
     record_bag = LaunchConfiguration('record_bag')
     run_trajectory = LaunchConfiguration('run_trajectory')
     trajectory_type = LaunchConfiguration('trajectory_type')
+    verify_controller = LaunchConfiguration('verify_controller')
 
     simulation = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
@@ -34,11 +36,11 @@ def generate_launch_description():
     )
 
     bag_record = TimerAction(
-        period=3.0,
+        period=5.0,
         actions=[
             ExecuteProcess(
                 cmd=[
-                    'ros2', 'bag', 'record', '-o', 'atawi_demo_bag',
+                    'ros2', 'bag', 'record', '-o', bag_name,
                     '/joint_states', '/tf', '/tf_static', '/clock',
                     '/model/atawi_3a3/odometry',
                 ],
@@ -48,11 +50,28 @@ def generate_launch_description():
         ],
     )
 
+    controller_check = TimerAction(
+        period=22.0,
+        actions=[
+            ExecuteProcess(
+                cmd=[
+                    'ros2', 'run', 'mon_robot_control',
+                    'verify_controller_tracking.py',
+                ],
+                output='screen',
+                condition=IfCondition(verify_controller),
+            ),
+        ],
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument('run_trajectory', default_value='true'),
         DeclareLaunchArgument('trajectory_type', default_value='sweep'),
         DeclareLaunchArgument('record_bag', default_value='false'),
+        DeclareLaunchArgument('bag_name', default_value='atawi_demo_bag'),
+        DeclareLaunchArgument('verify_controller', default_value='false'),
         simulation,
         bag_record,
         trajectory,
+        controller_check,
     ])

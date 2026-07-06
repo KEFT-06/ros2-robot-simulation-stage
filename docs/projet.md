@@ -192,8 +192,9 @@ Les deux axes de rotation sont coaxiaux autour de Z.
 
 | Link | Rôle |
 |---|---|
-| `world` | Repère fixe global — **présent uniquement hors Gazebo** (RViz). En simulation, la base est libre pour flotter. |
-| `base_link` | Corps principal du robot (racine en simulation) |
+| `world` | Repère fixe global |
+| `hull_link` | Repère technique invisible, fixé au monde pour stabiliser le bateau |
+| `base_link` | Corps principal du robot, STL recentré et posé horizontalement sur l'eau |
 | `head_link` | Tête orientable |
 | `rotor_link` | Rotor / support des pales |
 | `tool_link` | Repère effecteur final |
@@ -292,7 +293,7 @@ ros2 launch mon_robot_bringup simulation.launch.py
 Ce lancement :
 
 - charge le monde SDF aquatique ;
-- spawn le robot via `-string` (URDF xacro) ;
+- spawn le robot via le topic `robot_description` ;
 - démarre `gz_ros2_control` avec les spawners `joint_state_broadcaster` + `joint_trajectory_controller` (`load_controllers:=true` par défaut).
 
 Désactiver les contrôleurs :
@@ -310,35 +311,35 @@ Monde principal : `mon_robot_bringup/worlds/robot_world.sdf`
 Contenu :
 
 - plugins système Gazebo Harmonic : `Physics`, `SceneBroadcaster`, `UserCommands` ;
-- **flottaison réelle** via le plugin `Buoyancy` gradué (surface d'eau à `z=0`, eau 1000 kg/m³, air ~1,2 kg/m³) ;
-- surface d'eau **purement visuelle** `water_surface` (aucune collision : la portance vient du plugin Buoyancy), teinte mer turquoise + rendu PBR ;
-- lignes de vague visuelles `wave_lines` ;
+- surface d'eau **purement visuelle** `water_surface` (aucune collision), teinte mer turquoise ;
+- petites crêtes de vague visuelles `wave_lines` autour du bateau ;
 - ciel et éclairage adaptés à une scène maritime.
 
-**Coque fixe, à plat sur l'eau.** Le corps racine est `hull_link` : une **coque large et plate** (`2.4 × 1.2 × 0.4 m`). Elle est **fixée au monde** (joint `world_to_hull`) → le bateau est **parfaitement à plat et immobile** ; il ne bouge **que** lorsqu'on commande une trajectoire (seuls `joint1_head` et `joint2_rotor` sont mobiles). Le robot ATAWI-3A3 est **couché à l'horizontale** sur le pont via le joint fixe `hull_to_base` (`rpy="0 -π/2 0"`).
+**Bateau fixe, à plat sur l'eau.** Le repère racine de simulation est `hull_link`, mais il est maintenant **invisible** : il conserve les frames ROS/Gazebo sans afficher de bloc noir. Il est fixé au monde par `world_to_hull`, donc le bateau reste stable et horizontal. Le robot ATAWI-3A3 est couché à l'horizontale via `hull_to_base` (`rpy="1.5708 0 1.5708"`).
 
-La taille du robot est pilotée par une **propriété xacro unique** `s` (facteur d'échelle, **×10** par défaut) dans `mon_robot.urdf.xacro` : changez cette seule valeur pour redimensionner tout le device. Le plugin `Buoyancy` a été retiré (inutile pour un bateau fixe).
+La taille du robot est pilotée par une **propriété xacro unique** `s` (facteur d'échelle, `1.0` par défaut) dans `mon_robot.urdf.xacro`. Le plugin `Buoyancy` a été retiré : la scène actuelle privilégie un rendu stable pour la démo plutôt qu'une dynamique navale.
 
 ### Ajuster la pose du bateau
 
-- **Hauteur sur l'eau** : `origin z` du joint `world_to_hull` (par défaut `0.15`).
-- **Position du robot sur le pont** : `origin xyz` du joint `hull_to_base`.
-- **Taille** : propriété `s` (×10).
+- **Hauteur sur l'eau** : `origin z` du joint `world_to_hull` (par défaut `0.13`).
+- **Position/orientation du robot** : `origin xyz/rpy` du joint `hull_to_base`.
+- **Taille** : propriété `s` (`1.0`).
 
 ### Course temporelle
 
-`demo.launch.py` enchaîne : simulation → chargement des contrôleurs (sur fin du spawn) → trajectoire chronométrée → enregistrement rosbag de `/joint_states`, `/tf`, `/clock` et de l'odométrie 3D `/model/atawi_3a3/odometry` (pose du bateau dans le temps).
+`demo.launch.py` enchaîne : simulation → chargement des contrôleurs (sur fin du spawn) → trajectoire chronométrée → enregistrement rosbag optionnel de `/joint_states`, `/tf`, `/tf_static`, `/clock` et `/model/atawi_3a3/odometry`.
 
 ```bash
-ros2 launch mon_robot_bringup demo.launch.py record_bag:=true run_trajectory:=true
+ros2 launch mon_robot_bringup demo.launch.py record_bag:=true run_trajectory:=true bag_name:=atawi_demo_bag
 # Ctrl+C, puis :
 ros2 bag info atawi_demo_bag
 ```
 
 ### Limites actuelles
 
-- flottaison statique (poussée d'Archimède) **sans** courants, vagues physiques ni traînée hydrodynamique calibrée ;
-- pas de modèle hydrodynamique de Fossen (amortissement visqueux) : le bateau peut osciller/dériver lentement en lacet sous le couple de réaction des articulations.
+- vagues seulement visuelles, pas physiques ;
+- pas de modèle hydrodynamique de Fossen ni de poussée d'Archimède calibrée ;
+- bateau volontairement fixe pour obtenir une démo reproductible.
 
 Pour une simulation navale avancée, ajouter le plugin `Hydrodynamics` de Gazebo Harmonic avec des coefficients calibrés.
 
@@ -377,6 +378,16 @@ Mode topic (sans action) :
 ```bash
 ros2 run mon_robot_control send_trajectory.py home --ros-args -p use_action:=false
 ```
+
+### Vérification du suivi contrôleur
+
+`verify_controller_tracking.py` envoie une consigne courte au contrôleur, attend le résultat de l'action, puis compare `/joint_states` avec la cible finale.
+
+```bash
+ros2 run mon_robot_control verify_controller_tracking.py
+```
+
+Critère par défaut : erreur maximale `<= 0.08 rad` sur `joint1_head` et `joint2_rotor`.
 
 ### Envoi manuel (terminal séparé)
 
@@ -425,6 +436,7 @@ Options :
 ```bash
 ros2 launch mon_robot_bringup demo.launch.py trajectory_type:=spin
 ros2 launch mon_robot_bringup demo.launch.py record_bag:=true
+ros2 launch mon_robot_bringup demo.launch.py trajectory_type:=complex record_bag:=true bag_name:=atawi_demo_complex verify_controller:=true
 ```
 
 **Terminal 2 — trajectoire manuelle :**
@@ -440,6 +452,7 @@ ros2 run mon_robot_control send_trajectory.py complex
 ros2 control list_controllers
 ros2 topic echo /joint_states --once
 ros2 action list | grep follow_joint_trajectory
+ros2 run mon_robot_control verify_controller_tracking.py
 ros2 run mon_robot_control validate_fk.py
 ```
 
@@ -634,11 +647,13 @@ Sortie : `docs/doxygen/html/index.html`
 | Deps `package.xml` / Docker | OK |
 | Legacy Humble / `gazebo_ros*` | Retiré |
 | Meshes STL | Placeholder (non destructif) ou CAO |
-| Flottaison horizontale (plugin Buoyancy) | OK |
+| Bateau horizontal stable sur l'eau | OK |
 | Odométrie 3D du bateau | OK (`/model/atawi_3a3/odometry`) |
 | Hydrodynamique (courants, traînée) | Hors scope volontaire |
 | CI GitHub Actions | OK |
 | Démo | OK (`demo.launch.py`) |
+| Rosbag session Gazebo | OK via `demo.launch.py record_bag:=true` |
+| Vérification JTC | OK via `verify_controller_tracking.py` |
 | Capteurs simulés | Backlog |
 
 ### Travaux restants possibles

@@ -17,12 +17,13 @@
   <!-- Bateau FIXE au monde : pose a plat sur l'eau et IMMOBILE tant qu'aucune
        trajectoire n'est commandee (seuls joint1_head/joint2_rotor bougent).
        Le lien "world" sert aussi de repere fixe en RViz.
-       world_to_hull origin z : hauteur du repere technique par rapport a l'eau (z=0). -->
+       world_to_hull origin z : hauteur du repere technique par rapport a l'eau (z=0).
+       z=0.13 place le bas du STL au contact visuel de la surface. -->
   <link name="world"/>
   <joint name="world_to_hull" type="fixed">
     <parent link="world"/>
     <child link="hull_link"/>
-    <origin xyz="0 0 0.15" rpy="0 0 0"/>
+    <origin xyz="0 0 0.13" rpy="0 0 0"/>
   </joint>
 
   <!-- ========== REPERE TECHNIQUE INVISIBLE ==========
@@ -83,6 +84,8 @@
       </material>
     </visual>
     <collision>
+      <!-- Origine = position reelle du handle dans les coords d'assemblage STL -->
+      <origin xyz="${0.666*s} ${0.908*s} ${1.272*s}" rpy="0 0 0"/>
       <geometry><box size="${0.010*s} ${0.008*s} ${0.025*s}"/></geometry>
     </collision>
     <inertial>
@@ -109,6 +112,8 @@
       </material>
     </visual>
     <collision>
+      <!-- Origine = position reelle du handle dans les coords d'assemblage STL -->
+      <origin xyz="${0.586*s} ${0.908*s} ${1.272*s}" rpy="0 0 0"/>
       <geometry><box size="${0.010*s} ${0.008*s} ${0.025*s}"/></geometry>
     </collision>
     <inertial>
@@ -285,11 +290,15 @@
     </inertial>
   </link>
 
-  <!-- ========== JOINT 1 — TETE (part2) ROTATION PRINCIPALE ========== -->
+  <!-- ========== JOINT 1 — TETE (part2) ROTATION PRINCIPALE ==========
+       L'axe passe par la position reelle de la tete dans les coords
+       d'assemblage STL (x=0.626, y=0.857) : la tete tourne sur elle-meme
+       au lieu d'orbiter autour de l'origine du STL. Les visuels du sous-
+       arbre compensent avec l'offset inverse. -->
   <joint name="joint1_head" type="revolute">
     <parent link="base_link"/>
     <child link="head_link"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="${0.626*s} ${0.857*s} ${1.351*s}" rpy="0 0 0"/>
     <axis xyz="0 0 1"/>
     <limit lower="-3.14159" upper="3.14159"
            effort="10.0" velocity="1.0"/>
@@ -298,6 +307,7 @@
 
   <link name="head_link">
     <visual>
+      <origin xyz="${-0.626*s} ${-0.857*s} ${-1.351*s}" rpy="0 0 0"/>
       <geometry>
         <mesh filename="${mesh_uri}/part2.stl"
               scale="${s} ${s} ${s}"/>
@@ -307,7 +317,7 @@
       </material>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0 0 ${0.010*s}" rpy="0 0 0"/>
       <geometry>
         <box size="${0.101*s} ${0.043*s} ${0.039*s}"/>
       </geometry>
@@ -332,6 +342,7 @@
 
   <link name="rotor_link">
     <visual>
+      <origin xyz="${-0.626*s} ${-0.857*s} ${-1.351*s}" rpy="0 0 0"/>
       <geometry>
         <mesh filename="${mesh_uri}/Blade_1.stl"
               scale="${s} ${s} ${s}"/>
@@ -341,7 +352,8 @@
       </material>
     </visual>
     <collision>
-      <geometry><cylinder radius="${0.015*s}" length="${0.006*s}"/></geometry>
+      <!-- Cylindre englobant l'impeller entier (les 4 pales, rayon ~0.045) -->
+      <geometry><cylinder radius="${0.045*s}" length="${0.006*s}"/></geometry>
     </collision>
     <inertial>
       <mass value="0.05"/>
@@ -358,6 +370,7 @@
   </joint>
   <link name="blade2_link">
     <visual>
+      <origin xyz="${-0.626*s} ${-0.857*s} ${-1.351*s}" rpy="0 0 0"/>
       <geometry>
         <mesh filename="${mesh_uri}/Blade_2.stl" scale="${s} ${s} ${s}"/>
       </geometry>
@@ -377,6 +390,7 @@
   </joint>
   <link name="blade3_link">
     <visual>
+      <origin xyz="${-0.626*s} ${-0.857*s} ${-1.351*s}" rpy="0 0 0"/>
       <geometry>
         <mesh filename="${mesh_uri}/Blade_3.stl" scale="${s} ${s} ${s}"/>
       </geometry>
@@ -396,6 +410,7 @@
   </joint>
   <link name="blade4_link">
     <visual>
+      <origin xyz="${-0.626*s} ${-0.857*s} ${-1.351*s}" rpy="0 0 0"/>
       <geometry>
         <mesh filename="${mesh_uri}/Blade_4.stl" scale="${s} ${s} ${s}"/>
       </geometry>

@@ -65,9 +65,8 @@ class TrajectoryPublisher(Node):
         pairs = self._build_waypoints(waypoints, time_from_start)
 
         if self.use_action:
-            self._send_action(pairs)
-        else:
-            self._publish_topic(pairs)
+            return self._send_action(pairs)
+        return self._publish_topic(pairs)
 
     def _publish_topic(self, pairs):
         msg = JointTrajectory()
@@ -88,11 +87,12 @@ class TrajectoryPublisher(Node):
 
         self._publisher.publish(msg)
         self.get_logger().info(f'Trajectoire publiee (topic): {len(msg.points)} points')
+        return True
 
     def _send_action(self, pairs):
         if not self._action_client.wait_for_server(timeout_sec=10.0):
             self.get_logger().error('Action server FollowJointTrajectory indisponible')
-            return
+            return False
 
         goal = FollowJointTrajectory.Goal()
         goal.trajectory.joint_names = self.joint_names
@@ -112,16 +112,31 @@ class TrajectoryPublisher(Node):
         future = self._action_client.send_goal_async(goal)
         rclpy.spin_until_future_complete(self, future, timeout_sec=15.0)
         goal_handle = future.result()
-        if not goal_handle.accepted:
+        if goal_handle is None or not goal_handle.accepted:
             self.get_logger().error('Goal rejete par joint_trajectory_controller')
-            return
+            return False
 
         result_future = goal_handle.get_result_async()
         rclpy.spin_until_future_complete(self, result_future, timeout_sec=30.0)
+        result = result_future.result()
+        if result is None:
+            self.get_logger().warn(
+                'Goal accepte, mais aucun resultat action recu avant timeout; '
+                'utilisez verify_controller_tracking.py pour valider /joint_states.'
+            )
+            return True
+        if result.result.error_code != 0:
+            self.get_logger().error(
+                f'Trajectoire terminee en erreur: code={result.result.error_code} '
+                f'message="{result.result.error_string}"'
+            )
+            return False
+
         self.get_logger().info('Trajectoire executee (action)')
+        return True
 
     def trajectory_home(self):
-        self.publish_trajectory([[0.0, 0.0]], [3.0])
+        return self.publish_trajectory([[0.0, 0.0]], [3.0])
 
     def trajectory_sweep_z(self):
         waypoints = [
@@ -132,7 +147,7 @@ class TrajectoryPublisher(Node):
             [-math.pi / 4, 0.0],
             [0.0, 0.0],
         ]
-        self.publish_trajectory(waypoints, [float(i) for i in range(len(waypoints))])
+        return self.publish_trajectory(waypoints, [float(i) for i in range(len(waypoints))])
 
     def trajectory_spin_rotor(self):
         waypoints = [
@@ -142,7 +157,7 @@ class TrajectoryPublisher(Node):
             [0.0, -math.pi],
             [0.0, 0.0],
         ]
-        self.publish_trajectory(waypoints, [float(i) for i in range(len(waypoints))])
+        return self.publish_trajectory(waypoints, [float(i) for i in range(len(waypoints))])
 
     def trajectory_complex(self):
         waypoints = [
@@ -153,7 +168,7 @@ class TrajectoryPublisher(Node):
             [math.pi / 4, -math.pi / 2],
             [0.0, 0.0],
         ]
-        self.publish_trajectory(waypoints, [float(i * 1.5) for i in range(len(waypoints))])
+        return self.publish_trajectory(waypoints, [float(i * 1.5) for i in range(len(waypoints))])
 
     def trajectory_sine_wave(self):
         waypoints = []
@@ -162,7 +177,7 @@ class TrajectoryPublisher(Node):
             t = i * 0.1
             waypoints.append([math.sin(t), math.cos(t) * math.pi / 4])
             times.append(t * 2.0)
-        self.publish_trajectory(waypoints, times)
+        return self.publish_trajectory(waypoints, times)
 
 
 def main():
@@ -178,15 +193,19 @@ def main():
         'sine': node.trajectory_sine_wave,
     }
 
+    exit_code = 0
     if traj_type in trajectories:
-        trajectories[traj_type]()
+        if not trajectories[traj_type]():
+            exit_code = 1
     else:
         node.get_logger().error(f'Trajectoire inconnue: {traj_type}')
         node.get_logger().info(f'Options: {", ".join(trajectories)}')
+        exit_code = 2
 
     node.destroy_node()
     rclpy.shutdown()
+    return exit_code
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

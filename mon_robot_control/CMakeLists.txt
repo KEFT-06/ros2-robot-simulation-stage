@@ -14,6 +14,7 @@ install(
     scripts/ik_validation.py
     scripts/validate_fk.py
     scripts/workspace_visualization.py
+    scripts/verify_controller_tracking.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
